@@ -9,8 +9,12 @@ O programa ligador (__tradutor.c__) deve receber um arquivo (__arquivo.asm__) co
 __Não__ será feita detecção de erros léxicos, semânticos ou sintáticos. 
 A linguagem _Assembly Hipotética_ é formada por um conjunto de instruções e diretivas mostradas na tabela a seguir:
 
-
-
+<p align="center">
+  <img src="tabela.png">
+  <br>
+  <t><b>Figura 1</b>: Tabela de instruções e diretivas da linguagem <i>Assembly Hipotética</i>.</t>
+  <br>
+</p>
 
 O programa deve entregar como saída um arquivo em formato texto (__arquivo.s__) que deve ser a tradução do programa de entrada em _Assembly IA-32_.
 
