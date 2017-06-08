@@ -7,17 +7,24 @@
  *  Lucas Santos 14/0151010
  */
 
+#include "tradutor.h"
+
  /*
-  *  validacao_argumentos()
+  *  validade_entrada()
   *
-  *  Funcao responsavel pela checagem do numero de argumentos de entrada
+  *  Funcao responsavel pela checagem da extensao argumento de entrada
   * do programa de traducao
   *
   *  Erros: Terminal (numero de argumentos na chamada do programa eh invalido!)
   *         Terminal (arquivo de entrada nao contem extensao '.asm'!)
   */
- void validacao_argumentos(int argc, char* argv[]){
-   
- }
+ void validade_entrada(int argc, char* argv[]){
 
-#include "tradutor.h"
+   // Se o arquivo de entrada nao contem a extensao valida, ERROR -1
+   char *validade_entrada_asm = ".asm";
+   if((strstr(argv[1], validade_entrada_asm))==NULL){
+     printf("Erro Terminal: Arquivo a ser traduzido nao contem extensao '.asm'!\n");
+     exit(-1);
+   }
+
+ }

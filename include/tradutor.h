@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /*
  *  Modulo que realiza a traducao da linguagem Assembly Hipotetica vista em aula
@@ -25,8 +26,8 @@
  */
 
 /*** PRE-TRADUCAO ***/
-// Avaliação dos argumentos passados pelo terminal para o programa
-void validacao_argumentos(int argc, char* argv[]);
+// Verifica se o arquivo de entrada é válido
+void validade_entrada(int argc, char* argv[]);
 
 /*** TRADUCAO ***/
 

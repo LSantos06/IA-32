@@ -29,3 +29,6 @@ prog: $(OBJ)
 
 clean:
 	rm -f $(ODIR)/*.o *~ core $(IDIR)/*~
+
+traduzir:
+	./prog $(asm_file)
