@@ -1,20 +1,29 @@
+section .data
+tam          dd      0
+endereco     dd      0xFFFFFFFF
 section .bss
-char        resb    1
+letra        resb    1
 section .text
 global _start
 _start:
-    ;LerChar
-    push    char
-    call    LerChar
-    ;EscreverChar
-    push    char
-    call    EscreverChar
+    ;Endereco de memoria de onde esta a string, tamanho da string
+    ;LerString
+    push    letra    
+    push    endereco    
+    push    tam
+    call    LerString
+    ;EscreverString
+    push    letra
+    push    endereco    
+    push    tam
+    call    EscreverString
+Fim:
     ;return 0
     mov     EAX,1
     mov     EBX,0
     int     80h
     
-LerChar:
+LerString:
     ;cria frame de pilha
     push    EBP
     mov     EBP,ESP
@@ -23,12 +32,16 @@ LerChar:
     push    EBX
     push    ECX
     push    EDX
-    ;syscall leitura do teclado
-    mov     EAX,3
-    mov     EBX,0
-    mov     ECX,[EBP+8]
-    mov     EDX,1
-    int     80h
+    ;ENDERECO
+    mov     EAX,[EBP+12]    
+LS_leitura:
+    mov     EBX,[EAX]  
+    ;verifica se chegou no TAM
+    ;verifica se eh enter 
+    ;le proximo CHAR
+    inc     EAX
+    jmp     LS_leitura
+LS_final:
     ;registradores utilizados
     pop     EDX
     pop     ECX
@@ -37,9 +50,9 @@ LerChar:
     ;limpa frame de pilha
     mov     ESP,EBP
     pop     EBP
-    ret
+    ret       
     
-EscreverChar:
+EscreverString:
     ;cria frame de pilha
     push    EBP
     mov     EBP,ESP
@@ -52,7 +65,7 @@ EscreverChar:
     mov     EAX,4
     mov     EBX,1
     mov     ECX,[EBP+8]
-    mov     EDX,1
+    mov     EDX,4
     int     80h
     ;registradores utilizados
     pop     EDX

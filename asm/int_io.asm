@@ -1,17 +1,17 @@
 section .data
-anterior    dd      0
+inteiro     dd      0
 section .bss
-inteiro     resb    1
+digito      resb    1
 section .text
 global _start
 _start:
     ;Inteiros com sinal de 32 bits [−2147483648, 2147483647]
     ;LerInteiro
-    push    inteiro    
-    push    anterior
+    push    digito    
+    push    inteiro
     call    LerInteiro
     ;EscreverInteiro
-    push    anterior
+    push    inteiro
     call    EscreverInteiro
 Fim:
     ;return 0
@@ -29,28 +29,29 @@ LerInteiro:
     push    ECX
     push    EDX
 LI_leitura:
-    ;le um digito do teclado
+    ;le um DIGITO do teclado
     mov     EAX,3
     mov     EBX,0
     mov     ECX,[EBP+12]
     mov     EDX,1
     int     80h
     ;verifica se eh - ou 0a9
+    ;verifica se eh enter
     cmp     BYTE [ECX],0x0A
     je      LI_final
-    ;subtrai 30 do digito lido
+    ;subtrai 30 do DIGITO
     mov     EBX,[ECX]
     sub     EBX,0x30
-    ;multiplica o numero armazenado por 10
+    ;multiplica o INTEIRO por 10
     mov     EDX,[EBP+8]
     mov     EAX,[EDX]
     mov     ECX,10
     mul     ECX     
-    ;soma o digito com o numero e armazena na memoria
+    ;soma o digito com o INTEIROx10 e armazena no INTEIRO
     add     EBX,EAX
     mov     EAX,[EBP+8]
     mov     [EAX],EBX
-    ;repete
+    ;le proximo DIGITO
     inc     BYTE [EBP+12]
     jmp     LI_leitura
 LI_final:
