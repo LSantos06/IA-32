@@ -1,25 +1,25 @@
 section .data
-inteiro     dd      0
+hexa        dd      0
 section .bss
 digito      resb    1
 section .text
 global _start
 _start:
-    ;Inteiros com sinal de 32 bits [−2147483648, 2147483647]
-    ;LerInteiro
+    ;Hexadecimais positivos de 32 bits [0x12345678]
+    ;LerHexa
     push    digito    
-    push    inteiro
-    call    LerInteiro
-    ;EscreverInteiro
-    push    inteiro
-    call    EscreverInteiro
+    push    hexa
+    call    LerHexa
+    ;EscreverHexa
+    push    hexa
+    call    EscreverHexa
 Fim:
     ;return 0
     mov     EAX,1
     mov     EBX,0
     int     80h
     
-LerInteiro:
+LerHexa:
     ;cria frame de pilha
     push    EBP
     mov     EBP,ESP
@@ -28,46 +28,32 @@ LerInteiro:
     push    EBX
     push    ECX
     push    EDX
-LI_leitura:
+LH_leitura:
     ;le um DIGITO do teclado
     mov     EAX,3
     mov     EBX,0
     mov     ECX,[EBP+12]
     mov     EDX,1
     int     80h
-    ;verifica se o primeiro DIGITO eh -
-    cmp     BYTE [ECX],0x2D
-    je      LI_negativo
     ;verifica se o DIGITO eh enter
     cmp     BYTE [ECX],0x0A
-    je      LI_final
-    ;subtrai 30 do DIGITO
-    mov     EBX,[ECX]
-    sub     EBX,0x30
-    ;verifica se o DIGITO esta entre 0 e 9, senao termina
+    je      LH_final
+    ;verifica se o DIGITO esta entre 0 e F, senao termina
     mov     ECX,EBX
-    cmp     ECX,0
-    jb      LI_erro
-    cmp     ECX,9
-    ja      LI_erro
-    ;multiplica o INTEIRO por 10
-    mov     EDX,[EBP+8]
-    mov     EAX,[EDX]
-    mov     ECX,10
-    mul     ECX     
-    ;soma o digito com o INTEIROx10 e armazena no INTEIRO
-    add     EBX,EAX
-    mov     EAX,[EBP+8]
-    mov     [EAX],EBX
+    cmp     ECX,0x30
+    jb      LH_final
+    cmp     ECX,0x46
+    ja      LH_final
+        
+    cmp     ECX,0x39
+    ja      LH_final
+    cmp     ECX,0x41
+    jb      LH_final    
+
     ;le proximo DIGITO
     inc     BYTE [EBP+12]
-    jmp     LI_leitura
-LI_negativo:
-    mov     EAX,[EBP+8]
-    mov     [EAX],ECX
-    jmp     LI_leitura
-LI_erro:
-LI_final:
+    jmp     LH_leitura
+LH_final:
     ;registradores utilizados
     pop     EDX
     pop     ECX
@@ -78,7 +64,7 @@ LI_final:
     pop     EBP
     ret       
                 
-EscreverInteiro:
+EscreverHexa:
     ;cria frame de pilha
     push    EBP
     mov     EBP,ESP
@@ -87,15 +73,7 @@ EscreverInteiro:
     push    EBX
     push    ECX
     push    EDX
-    ;i=0
-    ;do{
-    ;   str[i] = (char)((Valor % 10) + 0x30);
-    ;   Valor = (int) (Valor / 10);
-    ;   if (Valor != 0) str[i+1]= str[i]
-    ;   i = i+1
-    ;} while (Valor != 0)
-    ;str[i] = '/0'
-    ;syscall impressao monitor    
+    ;syscall impressao monitor
     mov     EAX,4
     mov     EBX,1
     mov     ECX,[EBP+8]
