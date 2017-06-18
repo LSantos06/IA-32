@@ -50,7 +50,7 @@ LS_leitura:
     ;armazenando CHAR no ENDERECO
     mov     EBX,[ECX]
     pop     EAX
-    mov     [EAX],EBX;
+    mov     [EAX],EBX
     ;verifica se o CHAR eh enter
     cmp     EBX,0x0A
     je      LS_final 

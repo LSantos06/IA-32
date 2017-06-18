@@ -1,6 +1,8 @@
 section .data
 inteiro     dd      0
+valor       dd      0
 section .bss
+string      resb    11
 digito      resb    1
 section .text
 global _start
@@ -11,7 +13,11 @@ _start:
     push    inteiro
     call    LerInteiro
     ;EscreverInteiro
-    push    inteiro
+    mov     ECX,[inteiro]
+    mov     DWORD [valor],ECX
+    push    string
+    push    digito    
+    push    valor
     call    EscreverInteiro
 Fim:
     ;return 0
@@ -67,6 +73,8 @@ LI_negativo:
     mov     [EAX],ECX
     jmp     LI_leitura
 LI_erro:
+    mov     EAX,[EBP+8]
+    mov     DWORD [EAX],900
 LI_final:
     ;registradores utilizados
     pop     EDX
@@ -77,7 +85,7 @@ LI_final:
     mov     ESP,EBP
     pop     EBP
     ret       
-                
+    
 EscreverInteiro:
     ;cria frame de pilha
     push    EBP
@@ -87,20 +95,56 @@ EscreverInteiro:
     push    EBX
     push    ECX
     push    EDX
-    ;i=0
-    ;do{
-    ;   str[i] = (char)((Valor % 10) + 0x30);
-    ;   Valor = (int) (Valor / 10);
-    ;   if (Valor != 0) str[i+1]= str[i]
-    ;   i = i+1
+    ;ECX = i = 0
+    xor     ECX,ECX
+EI_string:
+    ;Valor = (int) (Valor / 10);
+    ;str[i] = (char)((Valor % 10) + 0x30);
+    xor     EDX,EDX
+    mov     EAX,[EBP+8]
+    mov     EAX,[EAX]
+    mov     EBX,10
+    div     EBX
+    ;EAX = Valor
+    mov     EBX,[EBP+8]
+    mov     [EBX],EAX
+    ;EDX = str[i]
+    mov     EBX,[EBP+12]
+    mov     [EBX],EDX
+    add     DWORD [EBX],0x30
+    push    ECX
+    ;str[i+1] = str[i]    
+    jmp     EI_armazena
+EI_laco:
+    ;i++   
+    pop     ECX
+    inc     ECX
     ;} while (Valor != 0)
-    ;str[i] = '/0'
-    ;syscall impressao monitor    
+    mov     EAX,[EBP+8]
+    mov     EAX,[EAX]
+    cmp     EAX,0
+    jne     EI_string
+    jmp     EI_imprime
+EI_armazena:
+    ;str[i+1] = str[i] 
+    mov     EDX,[EBP+16]
+    inc     ECX
+    mov     EBX,[EBX]
+    mov     [EDX+ECX],EBX
+    jmp     EI_laco
+EI_imprime:
+    mov     EDX,[EBP+16]
+    add     EDX,ECX
+    push    ECX
+    ;syscall impressao monitor  
     mov     EAX,4
     mov     EBX,1
-    mov     ECX,[EBP+8]
-    mov     EDX,4
+    mov     ECX,EDX
+    mov     EDX,1
     int     80h
+    pop     ECX
+    loop    EI_imprime
+EI_final:    
     ;registradores utilizados
     pop     EDX
     pop     ECX
