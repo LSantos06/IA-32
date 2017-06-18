@@ -1,14 +1,16 @@
 section .data
-inteiro     dd      0
-valor       dd      0
+inteiro         dd      0
+valor           dd      0
 section .bss
-string      resb    11
-digito      resb    1
+string          resb    11
+flag_negativo   resb    1
+digito          resb    1
 section .text
 global _start
 _start:
     ;Inteiros com sinal de 32 bits [−2147483648, 2147483647]
     ;LerInteiro
+    push    flag_negativo
     push    digito    
     push    inteiro
     call    LerInteiro
@@ -16,6 +18,7 @@ _start:
     mov     ECX,[inteiro]
     mov     DWORD [valor],ECX
     push    string
+    push    flag_negativo    
     push    digito    
     push    valor
     call    EscreverInteiro
@@ -69,10 +72,14 @@ LI_leitura:
     inc     BYTE [EBP+12]
     jmp     LI_leitura
 LI_negativo:
-    mov     EAX,[EBP+8]
-    mov     [EAX],ECX
+    mov     EAX,[EBP+16]
+    mov     BYTE [EAX],0x2D
+    inc     BYTE [EBP+12]    
     jmp     LI_leitura
 LI_erro:
+    ;TESTE
+    mov     EAX,[EBP+16]
+    mov     BYTE [EAX],0x2D    
     mov     EAX,[EBP+8]
     mov     DWORD [EAX],900
 LI_final:
@@ -95,6 +102,13 @@ EscreverInteiro:
     push    EBX
     push    ECX
     push    EDX
+    ;imprime o -, se existir
+    mov     EAX,4
+    mov     EBX,1
+    mov     ECX,[EBP+16]
+    mov     EDX,1
+    int     80h
+EI_inicio:    
     ;ECX = i = 0
     xor     ECX,ECX
 EI_string:
@@ -111,7 +125,7 @@ EI_string:
     ;EDX = str[i]
     mov     EBX,[EBP+12]
     mov     [EBX],EDX
-    add     DWORD [EBX],0x30
+    add     BYTE [EBX],0x30
     push    ECX
     ;str[i+1] = str[i]    
     jmp     EI_armazena
@@ -127,13 +141,13 @@ EI_laco:
     jmp     EI_imprime
 EI_armazena:
     ;str[i+1] = str[i] 
-    mov     EDX,[EBP+16]
+    mov     EDX,[EBP+20]
     inc     ECX
     mov     EBX,[EBX]
     mov     [EDX+ECX],EBX
     jmp     EI_laco
 EI_imprime:
-    mov     EDX,[EBP+16]
+    mov     EDX,[EBP+20]
     add     EDX,ECX
     push    ECX
     ;syscall impressao monitor  
