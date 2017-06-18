@@ -46,7 +46,9 @@ LI_leitura:
     int     80h
     ;verifica se o primeiro DIGITO eh -
     cmp     BYTE [ECX],0x2D
+    push    ECX
     je      LI_negativo
+    pop     ECX
     ;verifica se o DIGITO eh enter
     cmp     BYTE [ECX],0x0A
     je      LI_final
@@ -72,16 +74,26 @@ LI_leitura:
     inc     BYTE [EBP+12]
     jmp     LI_leitura
 LI_negativo:
+    ;tratando o sinal de -
+    inc     ECX
+    mov     EAX,ECX
+    and     EAX,1
+    cmp     EAX,1
+    jne     LI_negativo_par
+LI_negativo_impar:
+    ;numero impar de -, numero eh negativo
     mov     EAX,[EBP+16]
     mov     BYTE [EAX],0x2D
+    jmp     LI_negativo_fim
+LI_negativo_par:
+    ;numero par de -, numero eh positivo
+    mov     EAX,[EBP+16]
+    mov     BYTE [EAX],0
+LI_negativo_fim:
+    ;fim
     inc     BYTE [EBP+12]    
     jmp     LI_leitura
 LI_erro:
-    ;TESTE
-    mov     EAX,[EBP+16]
-    mov     BYTE [EAX],0x2D    
-    mov     EAX,[EBP+8]
-    mov     DWORD [EAX],900
 LI_final:
     ;registradores utilizados
     pop     EDX
