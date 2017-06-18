@@ -30,20 +30,20 @@ LerHexa:
     push    EDX
     ;32 bits
     mov     ECX,8
-    MOV     EDX,0x31   
+    ;MOV     EDX,0x31   
 LH_leitura:
     push    ECX
     ;TESTE
-    MOV     ECX,[EBP+12]
-    MOV     DWORD [ECX],EDX  
+    ;MOV     ECX,[EBP+12]
+    ;MOV     DWORD [ECX],EDX  
     ;le um DIGITO do teclado
-    ;mov     EAX,3
-    ;mov     EBX,0
-    ;mov     ECX,[EBP+12]
-    ;mov     EDX,1
-    ;int     80h   
+    mov     EAX,3
+    mov     EBX,0
+    mov     ECX,[EBP+12]
+    mov     EDX,1
+    int     80h   
     ;verifica se o DIGITO eh enter
-    MOV     EAX,[ECX]
+    ;MOV     EAX,[ECX]
     cmp     BYTE [ECX],0x0A
     je      LH_final
 LH_numero:    
@@ -90,24 +90,25 @@ LH_hexa:
 LI_hexa_impar:     
     ;armazenamento se o contador for impar  
     mov     ECX,[EBP+8]
-    shl     BL,4
     or      [ECX],BL
-    inc     BYTE [EBP+8]     
+    shl     DWORD [ECX],8  
     jmp     LH_laco      
 LI_hexa_par:       
     ;armazenamento se o contador for par
     mov     ECX,[EBP+8]
+    shl     BL,4    
     mov     [ECX],BL
-    jmp     LH_laco               
-LH_erro:;      
+    jmp     LH_laco                               
+LH_erro:    
 LH_laco:    
-    ;armazenando DIGITO no ENDERECO
     ;le proximo DIGITO    
     inc     BYTE [EBP+12] 
-    ADD     EDX,0x10    
-    pop     ECX     
-    loop    LH_leitura
-;LH_erro:
+    ;ADD     EDX,0x10    
+    pop     ECX 
+    loop    LH_leitura 
+    ;final
+    mov     EDX,[EBP+8]          
+    shr     DWORD [EDX],8
 LH_final:
     ;registradores utilizados
     pop     EDX
@@ -132,7 +133,7 @@ EscreverHexa:
     mov     EAX,4
     mov     EBX,1
     mov     ECX,[EBP+8]
-    mov     EDX,1
+    mov     EDX,4
     int     80h
     ;registradores utilizados
     pop     EDX
