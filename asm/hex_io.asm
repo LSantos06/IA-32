@@ -11,6 +11,7 @@ _start:
     push    hexa
     call    LerHexa
     ;EscreverHexa
+    push    digito     
     push    hexa
     call    EscreverHexa
 Fim:
@@ -30,7 +31,8 @@ LerHexa:
     push    EDX
     ;32 bits
     mov     ECX,8
-    ;MOV     EDX,0x31   
+    ;TESTE
+    ;MOV     EDX,0x30   
 LH_leitura:
     push    ECX
     ;TESTE
@@ -43,6 +45,7 @@ LH_leitura:
     mov     EDX,1
     int     80h   
     ;verifica se o DIGITO eh enter
+    ;TESTE    
     ;MOV     EAX,[ECX]
     cmp     BYTE [ECX],0x0A
     je      LH_final
@@ -86,29 +89,34 @@ LH_hexa:
     push    ECX
     and     EAX,1
     cmp     EAX,1
-    jne     LI_hexa_par     
-LI_hexa_impar:     
+    jne     LH_hexa_par     
+LH_hexa_impar:   
     ;armazenamento se o contador for impar  
     mov     ECX,[EBP+8]
-    or      [ECX],BL
+    or      [ECX],BL  
+    ;checa o contador
+    pop     ECX    
+    push    ECX
+    cmp     ECX,1 
+    je      LH_laco 
+    ;se contador for diferente de 1 desloca 
+    mov     ECX,[EBP+8]    
     shl     DWORD [ECX],8  
     jmp     LH_laco      
-LI_hexa_par:       
+LH_hexa_par:       
     ;armazenamento se o contador for par
     mov     ECX,[EBP+8]
     shl     BL,4    
     mov     [ECX],BL
-    jmp     LH_laco                               
-LH_erro:    
+    jmp     LH_laco                                   
 LH_laco:    
     ;le proximo DIGITO    
     inc     BYTE [EBP+12] 
-    ;ADD     EDX,0x10    
+    ;TESTE    
+    ;ADD     EDX,1    
     pop     ECX 
     loop    LH_leitura 
-    ;final
-    mov     EDX,[EBP+8]          
-    shr     DWORD [EDX],8
+LH_erro:    
 LH_final:
     ;registradores utilizados
     pop     EDX
@@ -129,12 +137,118 @@ EscreverHexa:
     push    EBX
     push    ECX
     push    EDX
-    ;syscall impressao monitor
+    ;ler um byte 4x do hexa
+    mov     ECX,4
+EH_laco:    
+    ;contador
+    push    ECX  
+    ;lendo o byte atual
+    dec     ECX
+    mov     EAX,[EBP+8]    
+    add     EAX,ECX    
+    mov     BYTE BL,[EAX]  
+    ;TESTE
+    CMP     BL,0
+    JE      EH_contador
+    ;dividindo o byte em nibbles: DL primeiro nibble, CL segundo nibble
+    mov     CL,BL
+    mov     DL,BL
+    and     CL,0x0F
+    and     DL,0xF0
+    shr     DL,4   
+    jmp     EH_high_numero
+EH_contador:
+    ;lendo o proximo byte       
+    pop     ECX
+    loop    EH_laco
+    ;final
+    jmp     EH_final
+EH_high_numero:
+    ;ve se o DL eh digito ou char
+    cmp     DL,0x0
+    jb      EH_erro
+    cmp     DL,0x9
+    ja      EH_high_char
+    ;trata o numero
+    add     DL,0x30
+    mov     EAX,[EBP+12]
+    mov     [EAX],EDX
+    ;imprime
+    push    EDX         ;salva o high 
+    push    ECX         ;salva o low        
+    mov     EAX,4
+    mov     EBX,1           
+    mov     ECX,[EBP+12]  
+    mov     EDX,1
+    int     80h
+    pop     ECX         ;volta o low
+    pop     EDX         ;volta o high
+    ;analisa o low
+    jmp     EH_low_numero
+EH_high_char:
+    ;ve se o DL eh digito ou char
+    cmp     DL,0xF
+    ja      EH_erro
+    ;trata o char
+    add     DL,0x37
+    mov     EAX,[EBP+12]
+    mov     [EAX],EDX    
+    ;imprime
+    push    EDX         ;salva o high 
+    push    ECX         ;salva o low 
     mov     EAX,4
     mov     EBX,1
-    mov     ECX,[EBP+8]
-    mov     EDX,4
+    mov     ECX,[EBP+12]  
+    mov     EDX,1
     int     80h
+    pop     ECX         ;volta o low
+    pop     EDX         ;volta o high
+    ;analisa o low    
+    jmp     EH_low_numero   
+EH_low_numero:
+    ;ve se o CL eh digito ou char  
+    cmp     CL,0x0
+    jb      EH_erro
+    cmp     CL,0x9
+    ja      EH_low_char
+    ;trata o numero
+    add     CL,0x30
+    mov     EAX,[EBP+12]
+    mov     [EAX],ECX    
+    ;imprime
+    push    ECX         ;salva o low     
+    push    EDX         ;salva o high 
+    mov     EAX,4
+    mov     EBX,1  
+    mov     ECX,[EBP+12]
+    mov     EDX,1
+    int     80h
+    pop     EDX         ;volta o high    
+    pop     ECX         ;volta o low
+    ;volta para o laco    
+    jmp     EH_contador    
+EH_low_char:
+    ;ve se o CL eh digito ou char
+    cmp     CL,0xF
+    ja      EH_erro
+    ;trata o char
+    add     CL,0x37
+    mov     EAX,[EBP+12]
+    mov     [EAX],ECX    
+    ;imprime
+    push    ECX         ;salva o low     
+    push    EDX         ;salva o high     
+    mov     EAX,4
+    mov     EBX,1
+    mov     ECX,[EBP+12]  
+    mov     EDX,1
+    int     80h
+    pop     EDX         ;volta o high     
+    pop     ECX         ;volta o low 
+    ;volta para o laco     
+    jmp     EH_contador 
+EH_erro:
+EH_final:  
     ;registradores utilizados
     pop     EDX
     pop     ECX
