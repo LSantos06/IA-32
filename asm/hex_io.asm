@@ -1,5 +1,7 @@
 section .data
 hexa        dd      0
+x           dw      "0x"
+X_SIZE      equ     $-x
 section .bss
 digito      resb    1
 section .text
@@ -48,7 +50,7 @@ LH_leitura:
     ;TESTE    
     ;MOV     EAX,[ECX]
     cmp     BYTE [ECX],0x0A
-    je      LH_final
+    je      LH_enter
 LH_numero:    
     ;verifica se o DIGITO esta entre 0 e 9 
     cmp     BYTE [ECX],0x30
@@ -116,6 +118,28 @@ LH_laco:
     ;ADD     EDX,1    
     pop     ECX 
     loop    LH_leitura 
+LH_enter:  
+    ;checa o contador
+    pop     ECX    
+    push    ECX
+    and     ECX,1
+    cmp     ECX,1 
+    jne     LH_enter_par
+LH_enter_impar:
+    ;se o enter for digitado com um numero impar de infos
+    mov     ECX,[EBP+8]    
+    shr     DWORD [ECX],4
+    jmp     LH_final 
+LH_enter_par:
+    ;se o enter for digitado com todas as infos ocupadas acaba
+    pop     ECX    
+    push    ECX
+    cmp     ECX,0
+    je      LH_final  
+    ;se o enter for digitado com um numero par de infos
+    mov     ECX,[EBP+8]    
+    shr     DWORD [ECX],8  
+    jmp     LH_final          
 LH_erro:    
 LH_final:
     ;registradores utilizados
@@ -137,6 +161,12 @@ EscreverHexa:
     push    EBX
     push    ECX
     push    EDX
+    ;imprime 0x
+    mov     EAX,4
+    mov     EBX,1           
+    mov     ECX,x  
+    mov     EDX,X_SIZE
+    int     80h    
     ;ler um byte 4x do hexa
     mov     ECX,4
 EH_laco:    
@@ -146,10 +176,10 @@ EH_laco:
     dec     ECX
     mov     EAX,[EBP+8]    
     add     EAX,ECX    
-    mov     BYTE BL,[EAX]  
+    mov     BYTE BL,[EAX] 
     ;TESTE
-    CMP     BL,0
-    JE      EH_contador
+    ;CMP     BL,0
+    ;JE      EH_contador
     ;dividindo o byte em nibbles: DL primeiro nibble, CL segundo nibble
     mov     CL,BL
     mov     DL,BL
