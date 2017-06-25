@@ -11,7 +11,6 @@
 #include "montador_ia32.h"
 
 int main(int argc, char* argv[]){
-
   validade_entrada(argc, argv);
 
   return 0;

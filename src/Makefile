@@ -8,11 +8,11 @@ IDIR = ../include
 
 LIBS= -lm
 
-_DEPS =	tradutor.h montador_ia32.h
+_DEPS =	estruturas.h tradutor.h montador_ia32.h
 
 DEPS =	$(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = tradutor.o montador_ia32.o main.o
+_OBJ = estruturas.o tradutor.o montador_ia32.o main.o
 
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
