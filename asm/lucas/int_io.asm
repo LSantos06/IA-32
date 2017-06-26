@@ -1,6 +1,7 @@
 section .data
+menos           db      '-'
 inteiro         dd      0
-valor           dd      0
+;digito          dD      0x312D
 section .bss
 string          resb    11
 flag_negativo   resb    1
@@ -13,14 +14,11 @@ _start:
     push    flag_negativo
     push    digito    
     push    inteiro
-    call    LerInteiro
+    call    LerInteiro    
     ;EscreverInteiro
-    mov     ECX,[inteiro]
-    mov     DWORD [valor],ECX
-    push    string
-    push    flag_negativo    
-    push    digito    
-    push    valor
+    push    string     
+    push    digito       
+    push    inteiro     
     call    EscreverInteiro
 Fim:
     ;return 0
@@ -37,6 +35,9 @@ LerInteiro:
     push    EBX
     push    ECX
     push    EDX
+    ;TESTE
+    mov     ECX,0
+    push    ECX  
 LI_leitura:
     ;le um DIGITO do teclado
     mov     EAX,3
@@ -45,37 +46,37 @@ LI_leitura:
     mov     EDX,1
     int     80h
     ;verifica se o primeiro DIGITO eh -
-    cmp     BYTE [ECX],0x2D
-    push    ECX
+    mov     BL,[ECX]
+    cmp     BL,0x2D
     je      LI_negativo
-    pop     ECX
     ;verifica se o DIGITO eh enter
-    cmp     BYTE [ECX],0x0A
+    cmp     BL,0x0A
     je      LI_final
     ;subtrai 30 do DIGITO
-    mov     EBX,[ECX]
-    sub     EBX,0x30
+    sub     BL,0x30
     ;verifica se o DIGITO esta entre 0 e 9, senao termina
-    mov     ECX,EBX
-    cmp     ECX,0
+    cmp     BL,0
     jb      LI_erro
-    cmp     ECX,9
+    cmp     BL,9
     ja      LI_erro
     ;multiplica o INTEIRO por 10
     mov     EDX,[EBP+8]
     mov     EAX,[EDX]
     mov     ECX,10
-    mul     ECX     
+    mul     ECX    
     ;soma o digito com o INTEIROx10 e armazena no INTEIRO
     add     EBX,EAX
     mov     EAX,[EBP+8]
     mov     [EAX],EBX
     ;le proximo DIGITO
     inc     BYTE [EBP+12]
+    mov     ECX,[EBP+12]     
     jmp     LI_leitura
 LI_negativo:
-    ;tratando o sinal de -
+    ;tratando o sinal de -      
+    pop     ECX
     inc     ECX
+    push    ECX
     mov     EAX,ECX
     and     EAX,1
     cmp     EAX,1
@@ -83,7 +84,7 @@ LI_negativo:
 LI_negativo_impar:
     ;numero impar de -, numero eh negativo
     mov     EAX,[EBP+16]
-    mov     BYTE [EAX],0x2D
+    mov     BYTE [EAX],0x2D  
     jmp     LI_negativo_fim
 LI_negativo_par:
     ;numero par de -, numero eh positivo
@@ -91,10 +92,29 @@ LI_negativo_par:
     mov     BYTE [EAX],0
 LI_negativo_fim:
     ;fim
-    inc     BYTE [EBP+12]    
+    inc     BYTE [EBP+12] 
+    mov     ECX,[EBP+12]   
     jmp     LI_leitura
+LI_nega:  
+    ;negando o numero se ele for negativo
+    mov     EDX,[EBP+8]
+    neg     DWORD [EDX]
+    ;registradores utilizados
+    pop     EDX
+    pop     ECX
+    pop     EBX
+    pop     EAX
+    ;limpa frame de pilha
+    mov     ESP,EBP
+    pop     EBP
+    ret     
 LI_erro:
-LI_final:
+LI_final: 
+    ;ve se o numero eh negativo
+    mov     EAX,[EBP+16]         
+    mov     EAX,[EAX]     
+    cmp     AL,0x2D  
+    je      LI_nega
     ;registradores utilizados
     pop     EDX
     pop     ECX
@@ -114,10 +134,18 @@ EscreverInteiro:
     push    EBX
     push    ECX
     push    EDX
-    ;imprime o -, se existir
+    ;imprime o -, se existir    
+    mov     EAX,[EBP+8]
+    mov     EAX,[EAX]
+    and     EAX,0x80000000
+    cmp     EAX,0x80000000
+    jne     EI_inicio
+EI_menos:    
+    mov     EDX,[EBP+8]
+    neg     DWORD [EDX]
     mov     EAX,4
     mov     EBX,1
-    mov     ECX,[EBP+16]
+    mov     ECX,menos
     mov     EDX,1
     int     80h
 EI_inicio:    
@@ -153,13 +181,13 @@ EI_laco:
     jmp     EI_imprime
 EI_armazena:
     ;str[i+1] = str[i] 
-    mov     EDX,[EBP+20]
+    mov     EDX,[EBP+16]
     inc     ECX
     mov     EBX,[EBX]
     mov     [EDX+ECX],EBX
     jmp     EI_laco
 EI_imprime:
-    mov     EDX,[EBP+20]
+    mov     EDX,[EBP+16]
     add     EDX,ECX
     push    ECX
     ;syscall impressao monitor  
