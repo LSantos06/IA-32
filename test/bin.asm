@@ -1,6 +1,7 @@
 
 ;Programa que transforma um n�mero decimal
 ;a bin�rio
+; IF apenas de teste
 IF M
 STORE OLD_DATA
 

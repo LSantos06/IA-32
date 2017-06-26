@@ -122,7 +122,6 @@ void main_tradutor(char *nome_arq){
       for(i=0; tokens_linha[i]!="\0" && tokens_linha[i]!=NULL; i++){
         //Se for ;, pula pra proxima linha
         if(strstr(tokens_linha[i], ";")!=NULL){
-          printf("entrou aqui %s\n", tokens_linha[i]);
           break;
         }
         string_alta(tokens_linha[i]);

@@ -117,7 +117,7 @@ void exibe_lista(FILE* fp, lista_t *lista){
 	lista_t *aux = lista->proximo;
 
 	while(aux!=NULL){
-		fprintf(fp, "%s: resd %s\n", aux->id, aux->tamanho);
+		fprintf(fp, "%s resd %s\n", aux->id, aux->tamanho);
 		aux = aux->proximo;
 	}
 	fprintf(fp, "\n\n");
