@@ -1,6 +1,8 @@
 
 ;Programa que transforma um n�mero decimal
 ;a bin�rio
+; IF apenas de teste
+
 SECTION TEXT
 INPUT OLD_DATA
 LOAD OLD_DATA
