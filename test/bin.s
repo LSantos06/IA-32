@@ -1,6 +1,3 @@
-%if M == 1
-mov dword [OLD_DATA],eax
-%endif
 
 section .text
 global _start
@@ -13,7 +10,10 @@ mov dword [TMP_DATA],eax
 mov eax,[OLD_DATA]
 sub dword EAX, [TMP_DATA]
 mov dword [TMP_DATA],eax
-mov dword [NEW_DATA],[OLD_DATA]
+push ebx
+mov ebx, [NEW_DATA]
+mov dword [OLD_DATA], ebx
+pop ebx
 mov eax,[OLD_DATA]
 jg L1
 

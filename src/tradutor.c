@@ -154,7 +154,10 @@ void main_tradutor(char *nome_arq){
             fprintf(arq_saida, "je %s\n", string_operando(tokens_linha[i+1]));
           break;
           case COPY:
-            fprintf(arq_saida, "mov dword [%s],[%s]\n", string_operando(tokens_linha[i+1]), string_operando(tokens_linha[i+2]));
+            fprintf(arq_saida, "push ebx\n");
+            fprintf(arq_saida, "mov ebx, [%s]\n", tokens_linha[i+1]);
+            fprintf(arq_saida, "mov dword [%s], ebx\n", tokens_linha[i+2]);
+            fprintf(arq_saida, "pop ebx\n");
           break;
           case LOAD:
             fprintf(arq_saida, "mov eax,[%s]\n", string_operando(tokens_linha[i+1]));
