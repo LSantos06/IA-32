@@ -1,8 +1,9 @@
 section .data
 menos           db      '-'
 inteiro         dd      0
+valor           dd      0
 ;TESTE
-;digito          dD      0x3332312D
+;digito          dd      0x333231
 section .bss
 string          resb    11
 flag_negativo   resb    1
@@ -17,8 +18,11 @@ _start:
     push    inteiro
     call    LerInteiro    
     ;EscreverInteiro
+    mov     ECX,[inteiro]
+    mov     DWORD [valor],ECX    
     push    string     
-    push    digito       
+    push    digito
+    push    valor       
     push    inteiro     
     call    EscreverInteiro
 Fim:
@@ -153,7 +157,7 @@ EscreverInteiro:
     cmp     EAX,0x80000000
     jne     EI_inicio
 EI_menos:    
-    mov     EDX,[EBP+8]
+    mov     EDX,[EBP+12]
     neg     DWORD [EDX]
     mov     EAX,4
     mov     EBX,1
@@ -167,15 +171,15 @@ EI_string:
     ;Valor = (int) (Valor / 10);
     ;str[i] = (char)((Valor % 10) + 0x30);
     xor     EDX,EDX
-    mov     EAX,[EBP+8]
+    mov     EAX,[EBP+12]
     mov     EAX,[EAX]
     mov     EBX,10
     div     EBX
     ;EAX = Valor
-    mov     EBX,[EBP+8]
+    mov     EBX,[EBP+12]
     mov     [EBX],EAX
     ;EDX = str[i]
-    mov     EBX,[EBP+12]
+    mov     EBX,[EBP+16]
     mov     [EBX],EDX
     add     BYTE [EBX],0x30
     push    ECX
@@ -186,7 +190,7 @@ EI_laco:
     pop     ECX
     inc     ECX
     ;} while (Valor != 0)
-    mov     EAX,[EBP+8]
+    mov     EAX,[EBP+12]
     mov     EAX,[EAX]
     cmp     EAX,0
     jne     EI_string
@@ -196,13 +200,13 @@ EI_laco:
     jmp     EI_imprime
 EI_armazena:
     ;str[i+1] = str[i] 
-    mov     EDX,[EBP+16]
+    mov     EDX,[EBP+20]
     inc     ECX
     mov     EBX,[EBX]
     mov     [EDX+ECX],EBX
     jmp     EI_laco
 EI_imprime:
-    mov     EDX,[EBP+16]
+    mov     EDX,[EBP+20]
     add     EDX,ECX
     push    ECX
     ;syscall impressao monitor  
@@ -214,9 +218,17 @@ EI_imprime:
     pop     ECX
     loop    EI_imprime
 EI_final:    
+    ;conta o -, se existir    
+    mov     EAX,[EBP+8]
+    mov     EAX,[EAX]
+    and     EAX,0x80000000
+    cmp     EAX,0x80000000    
     ;chars impressos
     pop     EAX
+    jne     EI_nao_conta_menos  
+EI_conta_menos:      
     inc     EAX
+EI_nao_conta_menos:    
     ;registradores utilizados
     pop     EDX
     pop     ECX
