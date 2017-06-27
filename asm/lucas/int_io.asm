@@ -1,11 +1,11 @@
 section .data
 menos           db      '-'
 inteiro         dd      0
-;digito          dD      0x312D
+digito          dD      0x3332312D
 section .bss
 string          resb    11
 flag_negativo   resb    1
-digito          resb    1
+;digito          resb    1
 section .text
 global _start
 _start:
@@ -31,20 +31,26 @@ LerInteiro:
     push    EBP
     mov     EBP,ESP
     ;registradores utilizados
-    push    EAX
     push    EBX
     push    ECX
     push    EDX
-    ;TESTE
+    ;Contador de -
     mov     ECX,0
-    push    ECX  
+    push    ECX       
+    ;Contador de chars lidos
+    mov     EAX,0
+    push    EAX             
 LI_leitura:
     ;le um DIGITO do teclado
-    mov     EAX,3
-    mov     EBX,0
+    ;mov     EAX,3
+    ;mov     EBX,0
     mov     ECX,[EBP+12]
-    mov     EDX,1
-    int     80h
+    ;mov     EDX,1
+    ;int     80h 
+    ;chars lidos
+    pop     EAX
+    inc     EAX
+    push    EAX          
     ;verifica se o primeiro DIGITO eh -
     mov     BL,[ECX]
     cmp     BL,0x2D
@@ -70,13 +76,17 @@ LI_leitura:
     mov     [EAX],EBX
     ;le proximo DIGITO
     inc     BYTE [EBP+12]
-    mov     ECX,[EBP+12]     
+    mov     ECX,[EBP+12]      
     jmp     LI_leitura
 LI_negativo:
+    ;chars lidos
+    pop     EAX
     ;tratando o sinal de -      
     pop     ECX
     inc     ECX
     push    ECX
+    ;chars lidos    
+    push    EAX
     mov     EAX,ECX
     and     EAX,1
     cmp     EAX,1
@@ -93,17 +103,18 @@ LI_negativo_par:
 LI_negativo_fim:
     ;fim
     inc     BYTE [EBP+12] 
-    mov     ECX,[EBP+12]   
+    mov     ECX,[EBP+12] 
     jmp     LI_leitura
 LI_nega:  
     ;negando o numero se ele for negativo
     mov     EDX,[EBP+8]
     neg     DWORD [EDX]
+    ;chars lidos 
+    pop     EAX
     ;registradores utilizados
     pop     EDX
     pop     ECX
     pop     EBX
-    pop     EAX
     ;limpa frame de pilha
     mov     ESP,EBP
     pop     EBP
@@ -115,11 +126,12 @@ LI_final:
     mov     EAX,[EAX]     
     cmp     AL,0x2D  
     je      LI_nega
+    ;chars lidos 
+    pop     EAX    
     ;registradores utilizados
     pop     EDX
     pop     ECX
     pop     EBX
-    pop     EAX
     ;limpa frame de pilha
     mov     ESP,EBP
     pop     EBP
@@ -130,7 +142,6 @@ EscreverInteiro:
     push    EBP
     mov     EBP,ESP
     ;registradores utilizados
-    push    EAX
     push    EBX
     push    ECX
     push    EDX
@@ -178,6 +189,9 @@ EI_laco:
     mov     EAX,[EAX]
     cmp     EAX,0
     jne     EI_string
+    ;chars impressos
+    mov     EAX,ECX
+    push    EAX    
     jmp     EI_imprime
 EI_armazena:
     ;str[i+1] = str[i] 
@@ -199,11 +213,13 @@ EI_imprime:
     pop     ECX
     loop    EI_imprime
 EI_final:    
+    ;chars impressos
+    pop     EAX
+    inc     EAX
     ;registradores utilizados
     pop     EDX
     pop     ECX
     pop     EBX
-    pop     EAX
     ;limpa frame de pilha
     mov     ESP,EBP
     pop     EBP
