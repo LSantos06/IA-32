@@ -1,11 +1,12 @@
 section .data
 menos           db      '-'
 inteiro         dd      0
-digito          dD      0x3332312D
+;TESTE
+;digito          dD      0x3332312D
 section .bss
 string          resb    11
 flag_negativo   resb    1
-;digito          resb    1
+digito          resb    1
 section .text
 global _start
 _start:
@@ -42,11 +43,11 @@ LerInteiro:
     push    EAX             
 LI_leitura:
     ;le um DIGITO do teclado
-    ;mov     EAX,3
-    ;mov     EBX,0
+    mov     EAX,3
+    mov     EBX,0
     mov     ECX,[EBP+12]
-    ;mov     EDX,1
-    ;int     80h 
+    mov     EDX,1
+    int     80h 
     ;chars lidos
     pop     EAX
     inc     EAX
