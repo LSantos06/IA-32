@@ -46,6 +46,8 @@ void main_tradutor(char *nome_arq);
 void corta_asm(char *str);
 //Retorna string do operando, que pode ser um elemento de vetor
 char* string_operando(char *operando);
+//Funcao que escreve funcoes feitas em assembly no arquivo de saida
+void escreve_funcoes(FILE *arq_saida);
 
 //Passa uma string para caixa alta
 void string_alta(char *s);

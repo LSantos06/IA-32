@@ -1,10 +1,15 @@
 section .data
-inteiro         dd      0
-valor           dd      0
+inteiro1         dd      0
+inteiro2         dd      0
+valor1           dd      0
+valor2           dd      0
+newLine		 db 	0xA
+newLineSZ	EQU	$-newLine
 section .bss
 string          resb    11
 flag_negativo   resb    1
-digitoE         resb    1
+digito1          resb    1
+digito2          resb    1
 digito          resb    1
 section .text
 global _start
@@ -12,17 +17,42 @@ _start:
     ;Inteiros com sinal de 32 bits [−2147483648, 2147483647]
     ;LerInteiro
     push    flag_negativo
-    push    digito    
-    push    inteiro
+    push    digito1    
+    push    inteiro1
     call    LerInteiro
+    
+   ; mov byte [digito], 0
+    push    flag_negativo
+    push    digito1 
+    push    inteiro2
+    call    LerInteiro
+
     ;EscreverInteiro
-    mov     ECX,[inteiro]
-    mov     DWORD [valor],ECX
+    mov     ECX,[inteiro2]
+    mov     DWORD [valor2],ECX
     push    string
     push    flag_negativo    
-    push    digitoE   
-    push    valor
+    push    digito  
+    push    valor2
     call    EscreverInteiro
+	
+    mov EAX, 4
+    mov EBX, 1 
+    mov ECX, newLine
+    mov EDX, newLineSZ
+    int 80h
+
+    mov     ECX,[inteiro1]
+    mov     DWORD [valor1],ECX
+    push    string
+    push    flag_negativo    
+    push    digito    
+    push    valor1
+    call    EscreverInteiro
+
+    
+
+    
 Fim:
     ;return 0
     mov     EAX,1
@@ -96,12 +126,13 @@ LI_negativo_fim:
     jmp     LI_leitura
 LI_erro:
 LI_final:
-    mov dword [EBP+12], 0        ; Limpa valor do digito
     ;registradores utilizados
+    mov dword [ECX], 0
     pop     EDX
     pop     ECX
     pop     EBX
     pop     EAX
+    
     ;limpa frame de pilha
     mov     ESP,EBP
     pop     EBP
