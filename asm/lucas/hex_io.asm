@@ -1,8 +1,10 @@
 section .data
+valor       dd      0
 hexa        dd      0
 x           dw      "0x"
 X_SIZE      equ     $-x
 section .bss
+string      resb    8
 digito      resb    1
 section .text
 global _start
@@ -13,7 +15,11 @@ _start:
     push    hexa
     call    LerHexa
     ;EscreverHexa
-    push    digito     
+    mov     ECX,[hexa]
+    mov     DWORD [valor],ECX     
+    push    string    
+    push    digito   
+    push    valor       
     push    hexa
     call    EscreverHexa
 Fim:
@@ -27,14 +33,14 @@ LerHexa:
     push    EBP
     mov     EBP,ESP
     ;registradores utilizados
-    push    EAX
     push    EBX
     push    ECX
     push    EDX
     ;32 bits
     mov     ECX,8
     ;TESTE
-    ;MOV     EDX,0x30   
+    MOV     EDX,0x41
+    PUSH    EDX   
 LH_leitura:
     push    ECX
     ;TESTE
@@ -85,68 +91,38 @@ LH_minusculo:
     ;armazena    
     jmp     LH_hexa  
 LH_hexa:
-    ;checa contador
-    pop     ECX
-    mov     EAX,ECX
-    push    ECX
-    and     EAX,1
-    cmp     EAX,1
-    jne     LH_hexa_par     
-LH_hexa_impar:   
-    ;armazenamento se o contador for impar  
-    mov     ECX,[EBP+8]
-    or      [ECX],BL  
-    ;checa o contador
-    pop     ECX    
-    push    ECX
-    cmp     ECX,1 
-    je      LH_laco 
-    ;se contador for diferente de 1 desloca 
-    mov     ECX,[EBP+8]    
-    shl     DWORD [ECX],8  
-    jmp     LH_laco      
-LH_hexa_par:       
-    ;armazenamento se o contador for par
-    mov     ECX,[EBP+8]
-    shl     BL,4    
-    mov     [ECX],BL
+    ;multiplica o HEXA por 16
+    mov     EDX,[EBP+8]
+    mov     EAX,[EDX]
+    mov     ECX,16
+    mul     ECX    
+    ;soma o digito com o HEXAx16 e armazena no HEXA
+    add     EBX,EAX
+    mov     EAX,[EBP+8]
+    mov     [EAX],EBX     
     jmp     LH_laco                                   
 LH_laco:    
     ;le proximo DIGITO    
-    inc     BYTE [EBP+12] 
-    ;TESTE    
-    ;ADD     EDX,1    
-    pop     ECX 
-    loop    LH_leitura 
-LH_enter:  
-    ;checa o contador
-    pop     ECX    
-    push    ECX
-    and     ECX,1
-    cmp     ECX,1 
-    jne     LH_enter_par
-LH_enter_impar:
-    ;se o enter for digitado com um numero impar de infos
-    mov     ECX,[EBP+8]    
-    shr     DWORD [ECX],4
-    jmp     LH_final 
-LH_enter_par:
-    ;se o enter for digitado com todas as infos ocupadas acaba
-    pop     ECX    
-    push    ECX
-    cmp     ECX,0
-    je      LH_final  
-    ;se o enter for digitado com um numero par de infos
-    mov     ECX,[EBP+8]    
-    shr     DWORD [ECX],8  
-    jmp     LH_final          
-LH_erro:    
-LH_final:
-    ;registradores utilizados
-    pop     EDX
+    inc     BYTE [EBP+12]    
     pop     ECX
+    ;TESTE     
+    ;POP     EDX
+    ;ADD     EDX,1  
+    ;PUSH    EDX      
+    loop    LH_leitura
+LH_erro:      
+LH_enter:          
+LH_final:
+    pop     ECX
+    ;contador de chars lidos
+    mov     EAX,8
+    sub     EAX,ECX 
+    ;TESTE
+    pop     EDX 
+    ;registradores utilizados
+    pop     EDX    
+    pop     ECX    
     pop     EBX
-    pop     EAX
     ;limpa frame de pilha
     mov     ESP,EBP
     pop     EBP
@@ -157,7 +133,6 @@ EscreverHexa:
     push    EBP
     mov     EBP,ESP
     ;registradores utilizados
-    push    EAX
     push    EBX
     push    ECX
     push    EDX
@@ -169,121 +144,83 @@ EscreverHexa:
     int     80h    
     ;ler um byte 4x do hexa
     mov     ECX,4
-EH_laco:    
-    ;contador
-    push    ECX  
-    ;lendo o byte atual
-    dec     ECX
-    mov     EAX,[EBP+8]    
-    add     EAX,ECX    
-    mov     BYTE BL,[EAX] 
-    ;TESTE
-    ;CMP     BL,0
-    ;JE      EH_contador
-    ;dividindo o byte em nibbles: DL primeiro nibble, CL segundo nibble
-    mov     CL,BL
-    mov     DL,BL
-    and     CL,0x0F
-    and     DL,0xF0
-    shr     DL,4   
-    jmp     EH_high_numero
-EH_contador:
-    ;lendo o proximo byte       
+EH_inicio:    
+    ;ECX = i = 0
+    xor     ECX,ECX
+EH_string:
+    ;Valor = (int) (Valor / 16);
+    ;str[i] = (char)((Valor % 16) + );
+    xor     EDX,EDX
+    mov     EAX,[EBP+12]
+    mov     EAX,[EAX]
+    mov     EBX,16
+    div     EBX
+    ;EAX = Valor
+    mov     EBX,[EBP+12]
+    mov     [EBX],EAX
+    ;EDX = str[i]
+    mov     EBX,[EBP+16]
+    mov     [EBX],EDX
+    ;ve aonde esta o char
+EH_numero:
+    cmp     BYTE [EBX],0
+    jb      EH_erro
+    cmp     BYTE [EBX],9
+    ja      EH_letra  
+    ;eh um numero  
+    add     BYTE [EBX],0x30
+    push    ECX
+    ;str[i+1] = str[i]    
+    jmp     EH_armazena
+EH_letra:
+    cmp     BYTE [EBX],15
+    ja      EH_erro 
+    ;eh uma letra
+    add     BYTE [EBX],0x37
+    push    ECX
+    ;str[i+1] = str[i]    
+    jmp     EH_armazena
+EH_laco:
+    ;i++   
     pop     ECX
-    loop    EH_laco
-    ;final
-    jmp     EH_final
-EH_high_numero:
-    ;ve se o DL eh digito ou char
-    cmp     DL,0x0
-    jb      EH_erro
-    cmp     DL,0x9
-    ja      EH_high_char
-    ;trata o numero
-    add     DL,0x30
+    inc     ECX
+    ;} while (Valor != 0)
     mov     EAX,[EBP+12]
-    mov     [EAX],EDX
-    ;imprime
-    push    EDX         ;salva o high 
-    push    ECX         ;salva o low        
-    mov     EAX,4
-    mov     EBX,1           
-    mov     ECX,[EBP+12]  
-    mov     EDX,1
-    int     80h
-    pop     ECX         ;volta o low
-    pop     EDX         ;volta o high
-    ;analisa o low
-    jmp     EH_low_numero
-EH_high_char:
-    ;ve se o DL eh digito ou char
-    cmp     DL,0xF
-    ja      EH_erro
-    ;trata o char
-    add     DL,0x37
-    mov     EAX,[EBP+12]
-    mov     [EAX],EDX    
-    ;imprime
-    push    EDX         ;salva o high 
-    push    ECX         ;salva o low 
+    mov     EAX,[EAX]
+    cmp     EAX,0
+    jne     EH_string
+    ;chars impressos
+    mov     EAX,ECX
+    push    EAX    
+    jmp     EH_imprime
+EH_armazena:
+    ;str[i+1] = str[i] 
+    mov     EDX,[EBP+20]
+    inc     ECX
+    mov     EBX,[EBX]
+    mov     [EDX+ECX],EBX
+    jmp     EH_laco
+EH_imprime:
+    mov     EDX,[EBP+20]
+    add     EDX,ECX
+    push    ECX
+    ;syscall impressao monitor  
     mov     EAX,4
     mov     EBX,1
-    mov     ECX,[EBP+12]  
+    mov     ECX,EDX
     mov     EDX,1
     int     80h
-    pop     ECX         ;volta o low
-    pop     EDX         ;volta o high
-    ;analisa o low    
-    jmp     EH_low_numero   
-EH_low_numero:
-    ;ve se o CL eh digito ou char  
-    cmp     CL,0x0
-    jb      EH_erro
-    cmp     CL,0x9
-    ja      EH_low_char
-    ;trata o numero
-    add     CL,0x30
-    mov     EAX,[EBP+12]
-    mov     [EAX],ECX    
-    ;imprime
-    push    ECX         ;salva o low     
-    push    EDX         ;salva o high 
-    mov     EAX,4
-    mov     EBX,1  
-    mov     ECX,[EBP+12]
-    mov     EDX,1
-    int     80h
-    pop     EDX         ;volta o high    
-    pop     ECX         ;volta o low
-    ;volta para o laco    
-    jmp     EH_contador    
-EH_low_char:
-    ;ve se o CL eh digito ou char
-    cmp     CL,0xF
-    ja      EH_erro
-    ;trata o char
-    add     CL,0x37
-    mov     EAX,[EBP+12]
-    mov     [EAX],ECX    
-    ;imprime
-    push    ECX         ;salva o low     
-    push    EDX         ;salva o high     
-    mov     EAX,4
-    mov     EBX,1
-    mov     ECX,[EBP+12]  
-    mov     EDX,1
-    int     80h
-    pop     EDX         ;volta o high     
-    pop     ECX         ;volta o low 
-    ;volta para o laco     
-    jmp     EH_contador 
+    pop     ECX
+    loop    EH_imprime    
 EH_erro:
 EH_final:  
+    ;chars impressos
+    pop     EAX
+    add     EAX,2
     ;registradores utilizados
     pop     EDX
     pop     ECX
     pop     EBX
-    pop     EAX
     ;limpa frame de pilha
     mov     ESP,EBP
     pop     EBP

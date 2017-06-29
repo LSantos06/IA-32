@@ -1,13 +1,13 @@
 section .bss
-char        resb    1
+character        resb    1
 section .text
 global _start
 _start:
     ;LerChar
-    push    char
+    push    character
     call    LerChar
     ;EscreverChar
-    push    char
+    push    character
     call    EscreverChar
     ;return 0
     mov     EAX,1
@@ -19,7 +19,6 @@ LerChar:
     push    EBP
     mov     EBP,ESP
     ;registradores utilizados
-    push    EAX
     push    EBX
     push    ECX
     push    EDX
@@ -33,7 +32,8 @@ LerChar:
     pop     EDX
     pop     ECX
     pop     EBX
-    pop     EAX
+    ;retorno em EAX
+    mov     EAX,1
     ;limpa frame de pilha
     mov     ESP,EBP
     pop     EBP
@@ -44,7 +44,6 @@ EscreverChar:
     push    EBP
     mov     EBP,ESP
     ;registradores utilizados
-    push    EAX
     push    EBX
     push    ECX
     push    EDX
@@ -58,7 +57,8 @@ EscreverChar:
     pop     EDX
     pop     ECX
     pop     EBX
-    pop     EAX
+    ;retorno em EAX
+    mov     EAX,1
     ;limpa frame de pilha
     mov     ESP,EBP
     pop     EBP
