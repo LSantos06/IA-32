@@ -127,6 +127,7 @@ LI_negativo_fim:
 LI_erro:
 LI_final:
     ;registradores utilizados
+    mov ECX, [EBP+12]
     mov dword [ECX], 0
     pop     EDX
     pop     ECX

@@ -7,7 +7,6 @@ valor           dd      0
 section .bss
 string          resb    11
 flag_negativo   resb    1
-digitoE         resb    1
 digito          resb    1
 section .text
 global _start
@@ -20,11 +19,11 @@ _start:
     call    LerInteiro    
     ;EscreverInteiro
     mov     ECX,[inteiro]
-    mov     DWORD [valor],ECX
-    push    string
-    push    flag_negativo    
-    push    digitoE   
-    push    valor
+    mov     DWORD [valor],ECX    
+    push    string     
+    push    digito
+    push    valor       
+    push    inteiro     
     call    EscreverInteiro
 Fim:
     ;return 0
@@ -127,7 +126,6 @@ LI_nega:
     ret     
 LI_erro:
 LI_final: 
-    mov dword [EBP+12], 0        ; Limpa valor do digito
     ;ve se o numero eh negativo
     mov     EAX,[EBP+16]         
     mov     EAX,[EAX]     
