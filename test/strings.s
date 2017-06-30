@@ -3,19 +3,34 @@ section .text
 global _start
 _start:
 push 10
-push NOME
+push NOME1
 call LerString
-push 1
-push SEXO
+push SEXO1
+call LerChar
+push ENTER
+call LerChar
+push 10
+push NOME2
 call LerString
-push 1
-push SEXO
-call EscreverString
+push SEXO2
+call LerChar
+push ENTER
+call LerChar
+push SEXO1
+call EscreverChar
 push 0XA
 push NEWLINE
 call EscreverString
 push 10
-push NOME
+push NOME1
+call EscreverString
+push SEXO2
+call EscreverChar
+push 0XA
+push NEWLINE
+call EscreverString
+push 10
+push NOME2
 call EscreverString
 
 mov eax,1
@@ -26,8 +41,11 @@ section .data
 NEWLINE: dd 0xA
 
 section .bss
-SEXO: resd 1
-NOME: resd 1
+ENTER: resd 1
+SEXO2: resd 1
+SEXO1: resd 1
+NOME2: resd 10
+NOME1: resd 10
 
 
 section .data
