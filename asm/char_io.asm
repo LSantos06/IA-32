@@ -1,13 +1,13 @@
 section .bss
-char        resb    1
+character        resb    1
 section .text
 global _start
 _start:
     ;LerChar
-    push    char
+    push    character
     call    LerChar
     ;EscreverChar
-    push    char
+    push    character
     call    EscreverChar
     ;return 0
     mov     EAX,1

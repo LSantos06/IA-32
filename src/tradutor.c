@@ -166,24 +166,51 @@ void main_tradutor(char *nome_arq){
             fprintf(arq_saida, "mov dword [%s],eax\n", string_operando(tokens_linha[i+1]));
           break;
           case INPUT:
+            fprintf(arq_saida, "push flag_negativo\n");
+            fprintf(arq_saida, "push digito\n");
+            fprintf(arq_saida, "push %s\n", tokens_linha[i+1]);
+            fprintf(arq_saida, "call LerInteiro\n");
           break;
           case OUTPUT:
+            fprintf(arq_saida, "push string\n");
+            fprintf(arq_saida, "push flag_negativo\n");
+            fprintf(arq_saida, "push digitoE\n");
+            fprintf(arq_saida, "push %s\n", tokens_linha[i+1]);
+            fprintf(arq_saida, "call EscreverInteiro\n");
           break;
           case STOP:
             //Chamada pro kernel de fim
             fprintf(arq_saida, "\nmov eax,1\nmov ebx,0\nint 80h\n");
           break;
           case C_INPUT:
+            fprintf(arq_saida, "push %s", string_operando(tokens_linha[i+1]));
+            fprintf(arq_saida, "call LerChar");
           break;
           case C_OUTPUT:
+            fprintf(arq_saida, "push %s", string_operando(tokens_linha[i+1]));
+            fprintf(arq_saida, "call LerChar");
           break;
           case H_INPUT:
+            fprintf(arq_saida, "push digito\n");
+            fprintf(arq_saida, "push %s\n", tokens_linha[i+1]);
+            fprintf(arq_saida, "call LerHexa\n");
           break;
           case H_OUTPUT:
+            fprintf(arq_saida, "push digito\n");
+            fprintf(arq_saida, "push %s\n", tokens_linha[i+1]);
+            fprintf(arq_saida, "call EscreverHexa\n");
           break;
           case S_INPUT:
+            fprintf(arq_saida, "push %s\n", tokens_linha[i+2]);
+            fprintf(arq_saida, "push letra\n");
+            fprintf(arq_saida, "push %s\n", tokens_linha[i+1]);
+            fprintf(arq_saida, "call LerString\n");
           break;
           case S_OUTPUT:
+            fprintf(arq_saida, "push %s\n", tokens_linha[i+2]);
+            fprintf(arq_saida, "push letra\n");
+            fprintf(arq_saida, "push %s\n", tokens_linha[i+1]);
+            fprintf(arq_saida, "call EscreverString\n");
           break;
           case SECTION:
             string_baixa(tokens_linha[i+1]);
@@ -242,9 +269,35 @@ void main_tradutor(char *nome_arq){
     fprintf(arq_saida, "\nsection .bss\n");
     exibe_lista(arq_saida,lista_bss);
 
+    escreve_funcoes(arq_saida);
+
     libera_lista(lista_bss);
     fclose(arq_saida);
     fclose(arq_entrada);
+ }
+
+
+//Funcao que escreve no arquivo de saida todas as funcoes feitas em assembly
+ void escreve_funcoes(FILE *arq_saida){
+   char *string = "../asm/lucas/todas_funcoes.asm";
+   char linha[TLINHA];
+   char *instrucao;
+   FILE *arq_funcoes = fopen(string, "r");
+
+   if(arq_funcoes == NULL){
+     printf("Erro terminal: erro ao abrir arquivo %s\n", string);
+     exit(-3);
+   } //if
+
+   while(!feof(arq_funcoes)){
+			// Funcao fgets() lê até TLINHA caracteres ou até o '\n'
+			instrucao = fgets(linha, TLINHA, arq_funcoes);
+      if(instrucao!=NULL){
+        fprintf(arq_saida, "%s", instrucao);
+      }
+
+    } // while
+
  }
 
  char* int_para_string(int i, char* b){

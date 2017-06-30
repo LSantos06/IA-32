@@ -1,15 +1,12 @@
 section .data
 endereco     dq      0
 tam          dd      5
-section .bss
-letra        resb    1
 section .text
 global _start
 _start:
     ;Endereco de memoria de onde esta a string, tamanho da string
     ;LerString
-    push    tam    
-    push    letra       
+    push    tam         
     push    endereco     
     call    LerString
     ;TESTE
@@ -22,7 +19,6 @@ _start:
     ;INT     80h     
     ;EscreverString
     push    tam    
-    push    letra  
     push    endereco  
     call    EscreverString
     ;TESTE
@@ -40,9 +36,8 @@ Fim:
     int     80h
     
 LerString:
-    ;cria frame de pilha
-    push    EBP
-    mov     EBP,ESP
+    ;cria frame de pilha, 1 byte para char lido
+    enter   1,0
     ;registradores utilizados
     push    EBX
     push    ECX
@@ -50,7 +45,7 @@ LerString:
     ;ENDERECO
     mov     EAX,[EBP+8]   
     ;TAM
-    mov     EDX,[EBP+16]
+    mov     EDX,[EBP+12]
     mov     ECX,[EDX]   
 LS_leitura:
     ;TAM atual
@@ -60,7 +55,9 @@ LS_leitura:
     ;le um CHAR do teclado
     mov     EAX,3
     mov     EBX,0
-    mov     ECX,[EBP+12]
+    ;EBP-1, variavel local
+    mov     ECX,EBP
+    dec     ECX
     mov     EDX,1
     int     80h
     ;armazenando CHAR no ENDERECO
@@ -83,7 +80,7 @@ LS_enter:
     pop     EBX
     ;retorno em EAX
     dec     ECX
-    mov     EAX,[EBP+16]
+    mov     EAX,[EBP+12]
     mov     EAX,[EAX]
     sub     EAX,ECX  
     ;limpa frame de pilha
@@ -96,18 +93,16 @@ LS_final:
     pop     ECX
     pop     EBX
     ;retorno em EAX
-    mov     EAX,[EBP+16]
+    mov     EAX,[EBP+12]
     mov     EAX,[EAX]
     add     EAX,1  
     ;limpa frame de pilha
-    mov     ESP,EBP
-    pop     EBP
+    leave
     ret       
     
 EscreverString:
     ;cria frame de pilha
-    push    EBP
-    mov     EBP,ESP
+    enter   0,0
     ;registradores utilizados
     push    EBX
     push    ECX
@@ -115,7 +110,7 @@ EscreverString:
     ;ENDERECO
     mov     EAX,[EBP+8]   
     ;TAM
-    mov     EDX,[EBP+16]
+    mov     EDX,[EBP+12]
     mov     ECX,[EDX]   
 ES_leitura:
     ;TAM atual
@@ -146,7 +141,7 @@ ES_enter:
     pop     EBX
     ;retorno em EAX
     dec     ECX
-    mov     EAX,[EBP+16]
+    mov     EAX,[EBP+12]
     mov     EAX,[EAX]
     sub     EAX,ECX  
     ;limpa frame de pilha
@@ -159,10 +154,9 @@ ES_final:
     pop     ECX
     pop     EBX
     ;retorno em EAX
-    mov     EAX,[EBP+16]
+    mov     EAX,[EBP+12]
     mov     EAX,[EAX] 
     add     EAX,1     
     ;limpa frame de pilha
-    mov     ESP,EBP
-    pop     EBP
+    leave
     ret 
