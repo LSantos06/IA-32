@@ -1,52 +1,51 @@
-TESTE: EQU 1
 
 section .text
 global _start
 _start:
-push OLD_DATA
+push ebx
+mov ebx, [ZERO]
+mov dword [OLDER], ebx
+pop ebx
+push ebx
+mov ebx, [ONE]
+mov dword [OLD], ebx
+pop ebx
+push LIMIT
 call LerInteiro
-mov eax,[OLD_DATA]
-L1: idiv dword [DOIS]
-mov dword [NEW_DATA],eax
-imul dword [DOIS]
-mov dword [TMP_DATA],eax
-mov eax,[OLD_DATA]
-sub dword EAX, [TMP_DATA]
-mov dword [TMP_DATA],eax
-push TMP_DATA
+push OLD
+call EscreverInteiro
+FRONT: mov eax,[OLDER]
+add dword EAX, [OLD]
+mov dword [NEW],eax
+sub dword EAX, [LIMIT]
+jg FINAL
+push NEW
 call EscreverInteiro
 push ebx
-mov ebx, [NEW_DATA]
-mov dword [OLD_DATA], ebx
+mov ebx, [OLD]
+mov dword [OLDER], ebx
 pop ebx
-mov eax,[OLD_DATA]
-%if TESTE == 1
-
-mov eax,1
-mov ebx,0
-int 80h
-%endif
-jg L1
+push ebx
+mov ebx, [NEW]
+mov dword [OLD], ebx
+pop ebx
+jmp FRONT
+FINAL: push LIMIT
+call EscreverInteiro
 
 mov eax,1
 mov ebx,0
 int 80h
 
 section .data
-DOIS: dd 2
-%if TESTE == 1
-section .bss
-TESTELABEL: resd 2
-section .data
-%endif
-%if TESTE == 1
-TRES: dd 3
-%endif
+ZERO: dd 0
+ONE: dd 1
 
 section .bss
-TMP_DATA: resd 1
-NEW_DATA: resd 1
-OLD_DATA: resd 1
+LIMIT: resd 1
+NEW: resd 1
+OLD: resd 1
+OLDER: resd 1
 
 
 section .data

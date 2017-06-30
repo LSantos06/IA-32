@@ -1,52 +1,30 @@
-TESTE: EQU 1
 
 section .text
 global _start
 _start:
-push OLD_DATA
+push N
 call LerInteiro
-mov eax,[OLD_DATA]
-L1: idiv dword [DOIS]
-mov dword [NEW_DATA],eax
-imul dword [DOIS]
-mov dword [TMP_DATA],eax
-mov eax,[OLD_DATA]
-sub dword EAX, [TMP_DATA]
-mov dword [TMP_DATA],eax
-push TMP_DATA
+mov eax,[N]
+FAT: sub dword EAX, [ONE]
+je FIM
+mov dword [AUX],eax
+imul dword [N]
+mov dword [N],eax
+mov eax,[AUX]
+jmp FAT
+FIM: push N
 call EscreverInteiro
-push ebx
-mov ebx, [NEW_DATA]
-mov dword [OLD_DATA], ebx
-pop ebx
-mov eax,[OLD_DATA]
-%if TESTE == 1
-
-mov eax,1
-mov ebx,0
-int 80h
-%endif
-jg L1
 
 mov eax,1
 mov ebx,0
 int 80h
 
 section .data
-DOIS: dd 2
-%if TESTE == 1
-section .bss
-TESTELABEL: resd 2
-section .data
-%endif
-%if TESTE == 1
-TRES: dd 3
-%endif
+ONE: dd 1
 
 section .bss
-TMP_DATA: resd 1
-NEW_DATA: resd 1
-OLD_DATA: resd 1
+N: resd 1
+AUX: resd 1
 
 
 section .data

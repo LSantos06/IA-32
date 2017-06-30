@@ -91,6 +91,7 @@ void main_tradutor(char *nome_arq){
    int i = 0;
    int flag_if = 0;
    int start_flag = 0;
+   int def_sec_data = 0, def_sec_text = 0;
 
    char* nome_saida;
    FILE* arq_saida;
@@ -167,15 +168,10 @@ void main_tradutor(char *nome_arq){
             fprintf(arq_saida, "mov dword [%s],eax\n", string_operando(tokens_linha[i+1]));
           break;
           case INPUT:
-            fprintf(arq_saida, "push flag_negativo\n");
-            fprintf(arq_saida, "push digito\n");
             fprintf(arq_saida, "push %s\n", tokens_linha[i+1]);
             fprintf(arq_saida, "call LerInteiro\n");
           break;
           case OUTPUT:
-            fprintf(arq_saida, "push string\n");
-            fprintf(arq_saida, "push flag_negativo\n");
-            fprintf(arq_saida, "push digitoE\n");
             fprintf(arq_saida, "push %s\n", tokens_linha[i+1]);
             fprintf(arq_saida, "call EscreverInteiro\n");
           break;
@@ -192,24 +188,20 @@ void main_tradutor(char *nome_arq){
             fprintf(arq_saida, "call LerChar");
           break;
           case H_INPUT:
-            fprintf(arq_saida, "push digito\n");
             fprintf(arq_saida, "push %s\n", tokens_linha[i+1]);
             fprintf(arq_saida, "call LerHexa\n");
           break;
           case H_OUTPUT:
-            fprintf(arq_saida, "push digito\n");
             fprintf(arq_saida, "push %s\n", tokens_linha[i+1]);
             fprintf(arq_saida, "call EscreverHexa\n");
           break;
           case S_INPUT:
             fprintf(arq_saida, "push %s\n", tokens_linha[i+2]);
-            fprintf(arq_saida, "push letra\n");
             fprintf(arq_saida, "push %s\n", tokens_linha[i+1]);
             fprintf(arq_saida, "call LerString\n");
           break;
           case S_OUTPUT:
             fprintf(arq_saida, "push %s\n", tokens_linha[i+2]);
-            fprintf(arq_saida, "push letra\n");
             fprintf(arq_saida, "push %s\n", tokens_linha[i+1]);
             fprintf(arq_saida, "call EscreverString\n");
           break;
@@ -217,21 +209,45 @@ void main_tradutor(char *nome_arq){
             string_baixa(tokens_linha[i+1]);
             fprintf(arq_saida, "\nsection .%s\n", tokens_linha[i+1]);
             if(!strcmp(tokens_linha[i+1], "text")){
+              def_sec_text = 1;
+              def_sec_data = 0;
               if(!start_flag){
                 fprintf(arq_saida, "global _start\n_start:\n");
                 start_flag = 1;
-              }
+              } //if start_flag
+            } //if strcmp
+            else if(!strcmp(tokens_linha[i+1], "data")){
+              def_sec_text = 0;
+              def_sec_data = 1;
             }
           break;
           case SPACE:
             //Se tiver operando
-            if(tokens_linha[i+1]!="\0" && tokens_linha[i+1]!=NULL && (strstr(tokens_linha[i+1], ";")==NULL)){
-              insere_elemento(lista_bss, tokens_linha[i-1], tokens_linha[i+1]);
+            if(flag_if){
+               fprintf(arq_saida, "section .bss\n");
+              if(tokens_linha[i+1]!="\0" && tokens_linha[i+1]!=NULL && (strstr(tokens_linha[i+1], ";")==NULL)){
+                fprintf(arq_saida, "%s resd %s\n", tokens_linha[i-1], tokens_linha[i+1]);
+              }
+              //Se n tiver operando
+              else{
+                fprintf(arq_saida, "%s resd 1\n", tokens_linha[i-1]);
+              }
+              if(def_sec_data){
+                fprintf(arq_saida, "section .data\n");
+              }
+              else if(def_sec_text){
+                fprintf(arq_saida, "section .text\n");
+              }
             }
-            //Se n tiver operando
             else{
-              insere_elemento(lista_bss, tokens_linha[i-1], "1");
-            }
+                if(tokens_linha[i+1]!="\0" && tokens_linha[i+1]!=NULL && (strstr(tokens_linha[i+1], ";")==NULL)){
+                    insere_elemento(lista_bss, tokens_linha[i-1], tokens_linha[i+1]);
+                    }
+                //Se n tiver operando
+                else{
+                  insere_elemento(lista_bss, tokens_linha[i-1], "1");
+                }
+              } //else (flag_if)
           break;
           case CONST:
             fprintf(arq_saida, "dd %s\n", tokens_linha[i+1]);
@@ -280,7 +296,7 @@ void main_tradutor(char *nome_arq){
 
 //Funcao que escreve no arquivo de saida todas as funcoes feitas em assembly
  void escreve_funcoes(FILE *arq_saida){
-   char *string = "../asm/lucas/todas_funcoes.asm";
+   char *string = "../asm/todas_funcoes.asm";
    char linha[TLINHA];
    char *instrucao;
    FILE *arq_funcoes = fopen(string, "r");
