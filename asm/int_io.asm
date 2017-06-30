@@ -13,16 +13,16 @@ global _start
 _start:
     ;Inteiros com sinal de 32 bits [−2147483648, 2147483647]
     ;LerInteiro
-    push    flag_negativo
-    push    digito    
+    push    flag_negativo ;passar para local
+    push    digito ;passar para local    
     push    inteiro
     call    LerInteiro    
     ;EscreverInteiro
     mov     ECX,[inteiro]
     mov     DWORD [valor],ECX    
-    push    string     
-    push    digito
-    push    valor       
+    push    string ;passar para local     
+    push    digito ;passar para local
+    push    valor ;passar para local       
     push    inteiro     
     call    EscreverInteiro
 Fim:

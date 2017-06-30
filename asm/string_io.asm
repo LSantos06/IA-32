@@ -9,7 +9,7 @@ _start:
     ;Endereco de memoria de onde esta a string, tamanho da string
     ;LerString
     push    tam    
-    push    letra       
+    push    letra ;passar para local       
     push    endereco     
     call    LerString
     ;TESTE
@@ -22,7 +22,7 @@ _start:
     ;INT     80h     
     ;EscreverString
     push    tam    
-    push    letra  
+    push    letra ;passar para local  
     push    endereco  
     call    EscreverString
     ;TESTE

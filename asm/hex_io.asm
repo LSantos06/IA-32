@@ -11,15 +11,15 @@ global _start
 _start:
     ;Hexadecimais positivos de 32 bits [0x12345678]
     ;LerHexa
-    push    digito    
+    push    digito ;passar para local    
     push    hexa
     call    LerHexa
     ;EscreverHexa
     mov     ECX,[hexa]
     mov     DWORD [valor],ECX     
-    push    string    
-    push    digito   
-    push    valor       
+    push    string ;passar para local    
+    push    digito ;passar para local   
+    push    valor ;passar para local       
     push    hexa
     call    EscreverHexa
 Fim:
