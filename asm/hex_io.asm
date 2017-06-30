@@ -1,25 +1,22 @@
 section .data
-valor       dd      0
 hexa        dd      0
 x           dw      "0x"
 X_SIZE      equ     $-x
 section .bss
-string      resb    8
-digito      resb    1
 section .text
 global _start
 _start:
     ;Hexadecimais positivos de 32 bits [0x12345678]
     ;LerHexa
-    push    digito ;passar para local    
+    ;push    digito ;passar para local    
     push    hexa
     call    LerHexa
     ;EscreverHexa
-    mov     ECX,[hexa]
-    mov     DWORD [valor],ECX     
-    push    string ;passar para local    
-    push    digito ;passar para local   
-    push    valor ;passar para local       
+    ;mov     ECX,[hexa]
+    ;mov     DWORD [valor],ECX     
+    ;push    string ;passar para local    
+    ;push    digito ;passar para local   
+    ;push    valor ;passar para local       
     push    hexa
     call    EscreverHexa
 Fim:
@@ -28,19 +25,26 @@ Fim:
     mov     EBX,0
     int     80h
     
+    %define DIGITO BYTE [EBP-1]
 LerHexa:
     ;cria frame de pilha
-    push    EBP
-    mov     EBP,ESP
+    ;push    EBP
+    ;mov     EBP,ESP
+    ; 1 Variavel local de 1 byte
+    enter 1,0
     ;registradores utilizados
     push    EBX
     push    ECX
     push    EDX
+    ;Zera argumento de entrada
+    mov ECX, [EBP+8]
+    mov dword [ECX], 0
     ;32 bits
     mov     ECX,8
     ;TESTE
     MOV     EDX,0x41
-    PUSH    EDX   
+    PUSH    EDX 
+      
 LH_leitura:
     push    ECX
     ;TESTE
@@ -49,7 +53,8 @@ LH_leitura:
     ;le um DIGITO do teclado
     mov     EAX,3
     mov     EBX,0
-    mov     ECX,[EBP+12]
+    mov     ECX,EBP
+    sub     ECX,1
     mov     EDX,1
     int     80h   
     ;verifica se o DIGITO eh enter
@@ -102,8 +107,12 @@ LH_hexa:
     mov     [EAX],EBX     
     jmp     LH_laco                                   
 LH_laco:    
-    ;le proximo DIGITO    
-    inc     BYTE [EBP+12]    
+    ;le proximo DIGITO  
+    push EBX 
+    mov     EBX,EBP 
+    sub EBX,1
+    inc     EBX  
+    pop EBX 
     pop     ECX
     ;TESTE     
     ;POP     EDX
@@ -124,18 +133,29 @@ LH_final:
     pop     ECX    
     pop     EBX
     ;limpa frame de pilha
-    mov     ESP,EBP
-    pop     EBP
+    ;mov     ESP,EBP
+    ;pop     EBP
+    
+    leave
     ret       
-                
+    %define VALOR  DWORD [EBP-13]
+    %define DIGITO BYTE  [EBP-1]
+    %define STRING BYTE  [EBP-9]            
 EscreverHexa:
     ;cria frame de pilha
-    push    EBP
-    mov     EBP,ESP
+    ;push    EBP
+    ;mov     EBP,ESP
+    ; Cria 3 variaveis locais
+    enter 13,0
     ;registradores utilizados
     push    EBX
     push    ECX
     push    EDX
+    
+    ; Valor = Inteiro
+    mov EDX, [EBP+8]
+    mov EDX, [EDX]
+    mov DWORD VALOR,EDX
     ;imprime 0x
     mov     EAX,4
     mov     EBX,1           
@@ -151,32 +171,29 @@ EH_string:
     ;Valor = (int) (Valor / 16);
     ;str[i] = (char)((Valor % 16) + );
     xor     EDX,EDX
-    mov     EAX,[EBP+12]
-    mov     EAX,[EAX]
+    mov     EAX,VALOR
     mov     EBX,16
     div     EBX
     ;EAX = Valor
-    mov     EBX,[EBP+12]
-    mov     [EBX],EAX
+    mov     VALOR,EAX
     ;EDX = str[i]
-    mov     EBX,[EBP+16]
-    mov     [EBX],EDX
+    mov     DIGITO,DL
     ;ve aonde esta o char
 EH_numero:
-    cmp     BYTE [EBX],0
+    cmp     BYTE DIGITO,0
     jb      EH_erro
-    cmp     BYTE [EBX],9
+    cmp     BYTE DIGITO,9
     ja      EH_letra  
     ;eh um numero  
-    add     BYTE [EBX],0x30
+    add     BYTE DIGITO,0x30
     push    ECX
     ;str[i+1] = str[i]    
     jmp     EH_armazena
 EH_letra:
-    cmp     BYTE [EBX],15
+    cmp     BYTE DIGITO,15
     ja      EH_erro 
     ;eh uma letra
-    add     BYTE [EBX],0x37
+    add     BYTE DIGITO,0x37
     push    ECX
     ;str[i+1] = str[i]    
     jmp     EH_armazena
@@ -185,8 +202,7 @@ EH_laco:
     pop     ECX
     inc     ECX
     ;} while (Valor != 0)
-    mov     EAX,[EBP+12]
-    mov     EAX,[EAX]
+    mov     EAX,VALOR
     cmp     EAX,0
     jne     EH_string
     ;chars impressos
@@ -195,13 +211,15 @@ EH_laco:
     jmp     EH_imprime
 EH_armazena:
     ;str[i+1] = str[i] 
-    mov     EDX,[EBP+20]
+    mov     EDX,EBP
+    sub     EDX,9
     inc     ECX
-    mov     EBX,[EBX]
+    mov     BL,DIGITO
     mov     [EDX+ECX],EBX
     jmp     EH_laco
 EH_imprime:
-    mov     EDX,[EBP+20]
+    mov     EDX,EBP
+    sub     EDX,9
     add     EDX,ECX
     push    ECX
     ;syscall impressao monitor  
@@ -222,6 +240,7 @@ EH_final:
     pop     ECX
     pop     EBX
     ;limpa frame de pilha
-    mov     ESP,EBP
-    pop     EBP
+    ;mov     ESP,EBP
+    ;pop     EBP
+    leave
     ret

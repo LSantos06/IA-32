@@ -1,28 +1,28 @@
 section .data
 menos           db      '-'
 inteiro         dd      0
-valor           dd      0
+;valor           dd      0
 ;TESTE
 ;digito          dd      0x333231
 section .bss
-string          resb    11
-flag_negativo   resb    1
-digito          resb    1
+;string          resb    11
+;flag_negativo   resb    1
+;digito          resb    1
 section .text
 global _start
 _start:
     ;Inteiros com sinal de 32 bits [−2147483648, 2147483647]
     ;LerInteiro
-    push    flag_negativo ;passar para local
-    push    digito ;passar para local    
-    push    inteiro
+    ;push    flag_negativo ;passar para local +16
+    ;push    digito ;passar para local    +12 
+    push    inteiro ; +8
     call    LerInteiro    
     ;EscreverInteiro
-    mov     ECX,[inteiro]
-    mov     DWORD [valor],ECX    
-    push    string ;passar para local     
-    push    digito ;passar para local
-    push    valor ;passar para local       
+   ; mov     ECX,[inteiro]
+   ; mov     DWORD [valor],ECX    
+    ;push    string ;passar para local     
+    ;push    digito ;passar para local
+    ;push    valor ;passar para local       
     push    inteiro     
     call    EscreverInteiro
 Fim:
@@ -30,11 +30,13 @@ Fim:
     mov     EAX,1
     mov     EBX,0
     int     80h
-    
+
+    %define FLAG_NEGATIVO BYTE [EBP-1]
+    %define DIGITO BYTE [EBP-2]    
 LerInteiro:
     ;cria frame de pilha
-    push    EBP
-    mov     EBP,ESP
+    ;Cria 2 espacos pra variavel local
+    enter 2,0
     ;registradores utilizados
     push    EBX
     push    ECX
@@ -49,17 +51,19 @@ LI_leitura:
     ;le um DIGITO do teclado
     mov     EAX,3
     mov     EBX,0
-    mov     ECX,[EBP+12]
+    ;[EBP-2]
+    mov     ECX,EBP
+    sub     ECX,2
     mov     EDX,1
-    int     80h 
+    int     80h          
+    ;verifica se o primeiro DIGITO eh -
+    mov     BL,DIGITO
+    cmp     BL,0x2D
+    je      LI_negativo
     ;chars lidos
     pop     EAX
     inc     EAX
-    push    EAX          
-    ;verifica se o primeiro DIGITO eh -
-    mov     BL,[ECX]
-    cmp     BL,0x2D
-    je      LI_negativo
+    push    EAX 
     ;verifica se o DIGITO eh enter
     cmp     BL,0x0A
     je      LI_final
@@ -80,9 +84,14 @@ LI_leitura:
     mov     EAX,[EBP+8]
     mov     [EAX],EBX
     ;le proximo DIGITO
-    inc     BYTE [EBP+12]
-    mov     ECX,[EBP+12]      
-    jmp     LI_leitura
+    mov     EAX, EBP
+    sub     EAX,2
+    inc     BYTE AL
+    mov     ECX,EAX     
+    pop     EAX
+    push    EAX
+    cmp     EAX,11 
+    jne     LI_leitura
 LI_negativo:
     ;chars lidos
     pop     EAX
@@ -98,18 +107,26 @@ LI_negativo:
     jne     LI_negativo_par
 LI_negativo_impar:
     ;numero impar de -, numero eh negativo
-    mov     EAX,[EBP+16]
+    ; EBP - 1
+    mov     EAX,EBP
+    dec     EAX
     mov     BYTE [EAX],0x2D  
     jmp     LI_negativo_fim
 LI_negativo_par:
     ;numero par de -, numero eh positivo
-    mov     EAX,[EBP+16]
+    mov     EAX,EBP
+    dec     EAX
     mov     BYTE [EAX],0
 LI_negativo_fim:
     ;fim
-    inc     BYTE [EBP+12] 
-    mov     ECX,[EBP+12] 
-    jmp     LI_leitura
+    mov     EBX, EBP
+    dec     EBX
+    ;inc     BYTE [EBP+12] 
+    mov     ECX,EBX
+    pop     EAX
+    push    EAX
+    cmp     EAX,11 
+    jne     LI_leitura
 LI_nega:  
     ;negando o numero se ele for negativo
     mov     EDX,[EBP+8]
@@ -121,14 +138,15 @@ LI_nega:
     pop     ECX
     pop     EBX
     ;limpa frame de pilha
-    mov     ESP,EBP
-    pop     EBP
+    ;mov     ESP,EBP
+    ;pop     EBP
+    
+    leave
     ret     
 LI_erro:
 LI_final: 
     ;ve se o numero eh negativo
-    mov     EAX,[EBP+16]         
-    mov     EAX,[EAX]     
+    mov     AL,FLAG_NEGATIVO     
     cmp     AL,0x2D  
     je      LI_nega
     ;chars lidos 
@@ -138,18 +156,30 @@ LI_final:
     pop     ECX
     pop     EBX
     ;limpa frame de pilha
-    mov     ESP,EBP
-    pop     EBP
+    ;mov     ESP,EBP
+    ;pop     EBP
+    
+    leave
     ret       
     
+    %define VALOR  DWORD [EBP-16]
+    %define DIGITO BYTE  [EBP-1]
+    %define STRING BYTE  [EBP-12]
 EscreverInteiro:
     ;cria frame de pilha
-    push    EBP
-    mov     EBP,ESP
+    ;push    EBP
+    ;mov     EBP,ESP
+    ;Cria 3 variaveis locai
+    enter 16,0
     ;registradores utilizados
     push    EBX
     push    ECX
     push    EDX
+    
+    ; Valor = Inteiro
+    mov EDX, [EBP+8]
+    mov EDX, [EDX]
+    mov DWORD VALOR,EDX
     ;imprime o -, se existir    
     mov     EAX,[EBP+8]
     mov     EAX,[EAX]
@@ -157,8 +187,7 @@ EscreverInteiro:
     cmp     EAX,0x80000000
     jne     EI_inicio
 EI_menos:    
-    mov     EDX,[EBP+12]
-    neg     DWORD [EDX]
+    neg     DWORD VALOR
     mov     EAX,4
     mov     EBX,1
     mov     ECX,menos
@@ -171,15 +200,15 @@ EI_string:
     ;Valor = (int) (Valor / 10);
     ;str[i] = (char)((Valor % 10) + 0x30);
     xor     EDX,EDX
-    mov     EAX,[EBP+12]
-    mov     EAX,[EAX]
+    mov     EAX,VALOR
     mov     EBX,10
     div     EBX
     ;EAX = Valor
-    mov     EBX,[EBP+12]
-    mov     [EBX],EAX
+    mov     VALOR,EAX
     ;EDX = str[i]
-    mov     EBX,[EBP+16]
+    ; Digito = EBP-1
+    mov     EBX,EBP
+    sub     EBX, 1
     mov     [EBX],EDX
     add     BYTE [EBX],0x30
     push    ECX
@@ -190,8 +219,7 @@ EI_laco:
     pop     ECX
     inc     ECX
     ;} while (Valor != 0)
-    mov     EAX,[EBP+12]
-    mov     EAX,[EAX]
+    mov     EAX,VALOR
     cmp     EAX,0
     jne     EI_string
     ;chars impressos
@@ -200,13 +228,16 @@ EI_laco:
     jmp     EI_imprime
 EI_armazena:
     ;str[i+1] = str[i] 
-    mov     EDX,[EBP+20]
+    ;string = EBP -12
+    mov     EDX,EBP
+    sub     EDX,12
     inc     ECX
     mov     EBX,[EBX]
     mov     [EDX+ECX],EBX
     jmp     EI_laco
 EI_imprime:
-    mov     EDX,[EBP+20]
+    mov     EDX,EBP
+    sub     EDX,12
     add     EDX,ECX
     push    ECX
     ;syscall impressao monitor  
@@ -234,6 +265,8 @@ EI_nao_conta_menos:
     pop     ECX
     pop     EBX
     ;limpa frame de pilha
-    mov     ESP,EBP
-    pop     EBP
+    ;mov     ESP,EBP
+    ;pop     EBP
+    
+    leave
     ret

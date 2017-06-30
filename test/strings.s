@@ -1,52 +1,51 @@
-TESTE: EQU 1
 
 section .text
 global _start
 _start:
-push OLD_DATA
-call LerInteiro
-mov eax,[OLD_DATA]
-L1: idiv dword [DOIS]
-mov dword [NEW_DATA],eax
-imul dword [DOIS]
-mov dword [TMP_DATA],eax
-mov eax,[OLD_DATA]
-sub dword EAX, [TMP_DATA]
-mov dword [TMP_DATA],eax
-push TMP_DATA
-call EscreverInteiro
-push ebx
-mov ebx, [NEW_DATA]
-mov dword [OLD_DATA], ebx
-pop ebx
-mov eax,[OLD_DATA]
-%if TESTE == 1
-
-mov eax,1
-mov ebx,0
-int 80h
-%endif
-jg L1
+push 10
+push NOME1
+call LerString
+push SEXO1
+call LerChar
+push ENTER
+call LerChar
+push 10
+push NOME2
+call LerString
+push SEXO2
+call LerChar
+push ENTER
+call LerChar
+push SEXO1
+call EscreverChar
+push 0XA
+push NEWLINE
+call EscreverString
+push 10
+push NOME1
+call EscreverString
+push SEXO2
+call EscreverChar
+push 0XA
+push NEWLINE
+call EscreverString
+push 10
+push NOME2
+call EscreverString
 
 mov eax,1
 mov ebx,0
 int 80h
 
 section .data
-DOIS: dd 2
-%if TESTE == 1
-section .bss
-TESTELABEL: resd 2
-section .data
-%endif
-%if TESTE == 1
-TRES: dd 3
-%endif
+NEWLINE: dd 0xA
 
 section .bss
-TMP_DATA: resd 1
-NEW_DATA: resd 1
-OLD_DATA: resd 1
+ENTER: resd 1
+SEXO2: resd 1
+SEXO1: resd 1
+NOME2: resd 10
+NOME1: resd 10
 
 
 section .data
@@ -572,6 +571,7 @@ EH_final:
     ret
 
 ; String
+; String
 LerString:
     ;cria frame de pilha, 1 byte para char lido
     enter   1,0
@@ -580,10 +580,10 @@ LerString:
     push    ECX
     push    EDX
     ;ENDERECO
-    mov     EAX,[EBP+8]   
+    mov     EAX,[EBP+8]
     ;TAM
-    mov     EDX,[EBP+12]
-    mov     ECX,[EDX]   
+    ;mov     EDX,[EBP+12]
+    mov     ECX,EDX
 LS_leitura:
     ;TAM atual
     push    ECX
@@ -600,7 +600,7 @@ LS_leitura:
     ;armazenando CHAR no ENDERECO
     mov     EBX,[ECX]
     pop     EAX
-    mov     [EAX],EBX   
+    mov     [EAX],EBX
     ;verifica se o CHAR eh enter
     cmp     EBX,0x0A
     je      LS_enter
@@ -618,12 +618,11 @@ LS_enter:
     ;retorno em EAX
     dec     ECX
     mov     EAX,[EBP+12]
-    mov     EAX,[EAX]
-    sub     EAX,ECX  
+    sub     EAX,ECX
     ;limpa frame de pilha
     mov     ESP,EBP
     pop     EBP
-    ret             
+    ret
 LS_final:
     ;registradores utilizados
     pop     EDX
@@ -631,12 +630,11 @@ LS_final:
     pop     EBX
     ;retorno em EAX
     mov     EAX,[EBP+12]
-    mov     EAX,[EAX]
-    add     EAX,1  
+    add     EAX,1
     ;limpa frame de pilha
     leave
-    ret       
-    
+    ret
+
 EscreverString:
     ;cria frame de pilha
     enter   0,0
@@ -645,32 +643,32 @@ EscreverString:
     push    ECX
     push    EDX
     ;ENDERECO
-    mov     EAX,[EBP+8]   
+    mov     EAX,[EBP+8]
     ;TAM
     mov     EDX,[EBP+12]
-    mov     ECX,[EDX]   
+    mov     ECX,EDX
 ES_leitura:
     ;TAM atual
     push    ECX
     push    EAX
     ;le um CHAR da memoria
     mov     EBX,1
-    pop     EAX    
+    pop     EAX
     mov     ECX,EAX
     push    EAX
     mov     EAX,4
     mov     EDX,1
-    int     80h   
+    int     80h
     ;imprime proximo CHAR, se ainda nao chegou ao TAM
     pop     EAX
-    inc     EAX    
+    inc     EAX
     ;verifica se o CHAR eh enter
     cmp     DWORD [ECX],0x0A
-    je      ES_enter      
+    je      ES_enter
     ;ve se ainda tem TAM
     pop     ECX
     loop    ES_leitura
-    jmp     ES_final    
+    jmp     ES_final
 ES_enter:
     ;registradores utilizados
     pop     ECX
@@ -679,12 +677,12 @@ ES_enter:
     ;retorno em EAX
     dec     ECX
     mov     EAX,[EBP+12]
-    mov     EAX,[EAX]
-    sub     EAX,ECX  
+    mov     EAX,EAX
+    sub     EAX,ECX
     ;limpa frame de pilha
     mov     ESP,EBP
     pop     EBP
-    ret     
+    ret
 ES_final:
     ;registradores utilizados
     pop     EDX
@@ -692,8 +690,7 @@ ES_final:
     pop     EBX
     ;retorno em EAX
     mov     EAX,[EBP+12]
-    mov     EAX,[EAX] 
     add     EAX,1     
     ;limpa frame de pilha
     leave
-    ret 
+    ret
