@@ -179,12 +179,12 @@ void main_tradutor(char *nome_arq){
             fprintf(arq_saida, "\nmov eax,1\nmov ebx,0\nint 80h\n");
           break;
           case C_INPUT:
-            fprintf(arq_saida, "push %s", string_operando(tokens_linha[i+1]));
-            fprintf(arq_saida, "call LerChar");
+            fprintf(arq_saida, "push %s\n", string_operando(tokens_linha[i+1]));
+            fprintf(arq_saida, "call LerChar\n");
           break;
           case C_OUTPUT:
-            fprintf(arq_saida, "push %s", string_operando(tokens_linha[i+1]));
-            fprintf(arq_saida, "call LerChar");
+            fprintf(arq_saida, "push %s\n", string_operando(tokens_linha[i+1]));
+            fprintf(arq_saida, "call EscreverChar\n");
           break;
           case H_INPUT:
             fprintf(arq_saida, "push %s\n", tokens_linha[i+1]);
