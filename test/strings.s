@@ -24,6 +24,9 @@ call EscreverString
 push 10
 push NOME1
 call EscreverString
+push 0XA
+push NEWLINE
+call EscreverString
 push SEXO2
 call EscreverChar
 push 0XA
@@ -31,6 +34,9 @@ push NEWLINE
 call EscreverString
 push 10
 push NOME2
+call EscreverString
+push 0XA
+push NEWLINE
 call EscreverString
 
 mov eax,1
@@ -599,11 +605,12 @@ LS_leitura:
     int     80h
     ;armazenando CHAR no ENDERECO
     mov     EBX,[ECX]
-    pop     EAX
-    mov     [EAX],EBX
     ;verifica se o CHAR eh enter
     cmp     EBX,0x0A
     je      LS_enter
+    pop     EAX
+    mov     [EAX],EBX
+    
     ;escreve proximo CHAR, se ainda nao chegou ao TAM
     inc     EAX
     ;ve se ainda tem TAM

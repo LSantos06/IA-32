@@ -1,3 +1,43 @@
+
+section .text
+global _start
+_start:
+push OP1
+call LerHexa
+push OP2
+call LerHexa
+mov eax,[OP1]
+add dword EAX, [OP2]
+mov dword [SOMA],eax
+mov eax,[OP1]
+sub dword EAX, [OP2]
+mov dword [SUBTRACAO],eax
+jmp PRINT
+PRINT: push SOMA
+call EscreverHexa
+push 1
+push NEWLINE
+call EscreverString
+push SUBTRACAO
+call EscreverHexa
+push 1
+push NEWLINE
+call EscreverString
+
+mov eax,1
+mov ebx,0
+int 80h
+
+section .data
+NEWLINE: dd 0xA
+
+section .bss
+SUBTRACAO: resd 1
+SOMA: resd 1
+OP2: resd 1
+OP1: resd 1
+
+
 section .data
 x           dw      "0x"
 X_SIZE      equ     $-x
