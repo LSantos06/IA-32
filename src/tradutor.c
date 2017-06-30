@@ -22,17 +22,18 @@ char *tokens_linha[100];
   */
  void validade_entrada(int argc, char* argv[]){
 
-   // Se o arquivo de entrada nao contem a extensao valida, ERROR -1
+   // Numero de argumentos invalido, ERROR -1
+   if(argc!=2 || argc==0){
+			printf("Erro Terminal: numero de argumentos na chamada do programa eh invalido!\nObteve-se %d argumentos.\n", argc-1);
+			exit(-1);
+		}
+
+   // Se o arquivo de entrada nao contem a extensao valida, ERROR -2
    char *validade_entrada_asm = ".asm";
    if((strstr(argv[1], validade_entrada_asm))==NULL){
      printf("Erro Terminal: Arquivo a ser traduzido nao contem extensao '.asm'!\n");
-     exit(-1);
+     exit(-2);
    }
-
-   if(argc!=2){
-			printf("Erro Terminal: numero de argumentos na chamada do programa eh invalido!\nObteve-se %d argumentos.\n", argc-1);
-			exit(-2);
-		}
 
     //Caso nao tenha erros terminais, chama funcao principal do tradutor
     main_tradutor(argv[1]);

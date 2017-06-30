@@ -7,7 +7,6 @@
  *  Lucas Santos 14/0151010
  */
 
-#include "tradutor.h"
 #include "montador_ia32.h"
 
 int main(int argc, char* argv[]){

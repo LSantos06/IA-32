@@ -8,21 +8,29 @@ IDIR = ../include
 
 LIBS= -lm
 
-_DEPS =	estruturas.h tradutor.h montador_ia32.h
+_DEPS =	estruturas.h tradutor.h
+_DEPS_montador = montador_ia32.h
 
 DEPS =	$(patsubst %,$(IDIR)/%,$(_DEPS))
+DEPS_montador = $(patsubst %,$(IDIR)/%,$(_DEPS_montador))
 
-_OBJ = estruturas.o tradutor.o montador_ia32.o main.o
+_OBJ = estruturas.o tradutor.o main_tradutor.o
+_OBJ_montador = montador_ia32.o main_montador.o
 
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+OBJ_montador =  $(patsubst %,$(ODIR)/%,$(_OBJ_montador))
 
 $(ODIR)/%.o: %.c $(DEPS)
-
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-prog: $(OBJ)
-
+tradutor: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+$(ODIR)/%.o: %.c $(DEPS_montador)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+montador: $(OBJ_montador)
+		$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 .PHONY:
 	clean
@@ -31,4 +39,4 @@ clean:
 	rm -f $(ODIR)/*.o *~ core $(IDIR)/*~
 
 traduzir:
-	./prog $(asm_file)
+	./tradutor $(asm_file)

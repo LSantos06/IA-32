@@ -11,5 +11,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+/*** PRE-MONTAGEM ***/
+// Verifica se o arquivo de entrada é válido
+void validade_entrada(int argc, char* argv[]);
+
+/*** MONTAGEM ***/
 
 #endif
