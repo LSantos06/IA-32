@@ -38,12 +38,37 @@ void validade_entrada(int argc, char* argv[]){
 }
 
 /*** MONTAGEM ***/
-
+/*
+ * Campo po (Primary Opcode):
+ *  0 = EAX
+ *  1 = ECX
+ *  2 = EDX
+ *  3 = EBX
+ *  4 = ESP
+ *  5 = EBP
+ *  6 = ESI
+ *  7 = EDI
+ *
+ * Campo o (Register/Opcode Field):
+ *  0-7 = extensao do opcode
+ *        00, Reg 0-7, 000
+ *  r   = ModR/M byte contem um operando registrador e um operando r/m (endereco de memoria armazenado em um reg)
+ *        Mod 00, Reg 0-7, R/M 5
+ */
 unsigned char* montagem(int argc, char *argv[]){
 
 }
 
 
+//TODO : Gerar este vetor code a partir do arquivo .s
+/* O programa simplesmente SAI e manda 42 para o SO */
+unsigned char code_teste[] = {
+    0xBB, 0x2A, 0x00, 0x00, 0x00, /* movl $42, %ebx */
+    0xB8, 0x01, 0x00, 0x00, 0x00, /* movl $1, %eax */
+    0xCD, 0x80            /* int $0x80 */
+};
+/*endereço virtual onde sera carregado o programa*/
+#define LOADADDR    0x08048000
 /* ELF FORMAT
 
 EHDR: a tabela de cabeçalho do arquivo ELF com informações gerais
@@ -76,8 +101,6 @@ void geracao_elf(unsigned char* code){
 
   size_t ehdrsz, phdrsz;
 
-  if (argc != 2)
-    errx(EX_USAGE,"input... ./%s filename\n",argv[0]);
   if (elf_version(EV_CURRENT) == EV_NONE)
     errx(EX_SOFTWARE,"elf_version is ev_none? %s\n",elf_errmsg(-1));
   if ((fd = open("arquivo.bin", O_WRONLY | O_CREAT, 0777)) < 0)

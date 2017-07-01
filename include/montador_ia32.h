@@ -23,17 +23,6 @@
 void validade_entrada(int argc, char* argv[]);
 
 /*** MONTAGEM ***/
-
-//TODO : Gerar este vetor code a partir do arquivo .s
-/* O programa simplesmente SAI e manda 42 para o SO */
-unsigned char code_teste[] = {
-    0xBB, 0x2A, 0x00, 0x00, 0x00, /* movl $42, %ebx */
-    0xB8, 0x01, 0x00, 0x00, 0x00, /* movl $1, %eax */
-    0xCD, 0x80            /* int $0x80 */
-};
-/*endereço virtual onde sera carregado o programa*/
-#define LOADADDR    0x08048000
-
 // Montagem em si
 unsigned char* montagem(int argc, char* argv[]);
 // Geracao do arquivo executavel
