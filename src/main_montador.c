@@ -11,7 +11,7 @@
 
 int main(int argc, char* argv[]){
   validade_entrada(argc, argv);
-  montagem(argc, argv);
+  geracao_elf(argc, argv);
 
   return 0;
 }
