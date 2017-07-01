@@ -12,11 +12,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <err.h>
+#include <fcntl.h>
+#include <libelf.h>
+#include <sysexits.h>
+#include <unistd.h>
 
 /*** PRE-MONTAGEM ***/
 // Verifica se o arquivo de entrada é válido
 void validade_entrada(int argc, char* argv[]);
 
 /*** MONTAGEM ***/
+// Montagem em si
+void montagem(int argc, char* argv[]);
 
 #endif

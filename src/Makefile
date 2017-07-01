@@ -7,6 +7,7 @@ LDIR = ../lib
 IDIR = ../include
 
 LIBS= -lm
+LIBS_montador = -lm -l elf
 
 _DEPS =	estruturas.h tradutor.h
 _DEPS_montador = montador_ia32.h
@@ -30,7 +31,7 @@ $(ODIR)/%.o: %.c $(DEPS_montador)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 montador: $(OBJ_montador)
-		$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+		$(CC) -o $@ $^ $(CFLAGS) $(LIBS_montador)
 
 .PHONY:
 	clean

@@ -11,6 +11,7 @@
 
 int main(int argc, char* argv[]){
   validade_entrada(argc, argv);
+  montagem(argc, argv);
 
   return 0;
 }
