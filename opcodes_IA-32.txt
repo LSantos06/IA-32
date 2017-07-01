@@ -1,4 +1,5 @@
 http://ref.x86asm.net/coder32.html#x00
+http://sparksandflames.com/files/x86InstructionChart.html
 
 // SEM IO
 PUSH REG           = po50+r
@@ -7,16 +8,16 @@ PUSH LABEL         = po68
 JE   LABEL         = po74
 JL   LABEL         = po7C
 JG   LABEL         = po7F
-ADD  REG,[LABEL]   = po81,o0,xL
-SUB  REG,[LABEL]   = po81,o5,xL
+ADD  REG,[LABEL]   = po81,o0
+SUB  REG,[LABEL]   = po81,o5
 MOV  [LABEL],REG   = po89,or
 MOV  REG,[LABEL]   = po8B,or
 MOV  REG,IMM       = poB8+r
-INT  IMM           = poCD,rlF
+INT  IMM           = poCD
 CALL LABEL         = poE8
 JMP  LABEL         = poEB
 IMUL [LABEL]       = poF7,o5
-IDIV [LABEL]       = poF5,o7
+IDIV [LABEL]       = poF7,o7
 
 // COM IO
 ...
