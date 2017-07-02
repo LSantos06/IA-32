@@ -2,13 +2,13 @@ section .data
 x           dw      "0x"
 X_SIZE      equ     $-x
 menos           db      '-'
- 
+
 
 section .text
 
 ; Funcoes de inteiro
     %define FLAG_NEGATIVO BYTE [EBP-1]
-    %define DIGITO BYTE [EBP-2]    
+    %define DIGITO BYTE [EBP-2]
 LerInteiro:
     ;cria frame de pilha
     ;Cria 2 espacos pra variavel local
@@ -19,10 +19,10 @@ LerInteiro:
     push    EDX
     ;Contador de -
     mov     ECX,0
-    push    ECX       
+    push    ECX
     ;Contador de chars lidos
     mov     EAX,0
-    push    EAX             
+    push    EAX
 LI_leitura:
     ;le um DIGITO do teclado
     mov     EAX,3
@@ -31,7 +31,7 @@ LI_leitura:
     mov     ECX,EBP
     sub     ECX,2
     mov     EDX,1
-    int     80h          
+    int     80h
     ;verifica se o primeiro DIGITO eh -
     mov     BL,DIGITO
     cmp     BL,0x2D
@@ -39,7 +39,7 @@ LI_leitura:
     ;chars lidos
     pop     EAX
     inc     EAX
-    push    EAX 
+    push    EAX
     ;verifica se o DIGITO eh enter
     cmp     BL,0x0A
     je      LI_final
@@ -54,7 +54,7 @@ LI_leitura:
     mov     EDX,[EBP+8]
     mov     EAX,[EDX]
     mov     ECX,10
-    mul     ECX    
+    mul     ECX
     ;soma o digito com o INTEIROx10 e armazena no INTEIRO
     add     EBX,EAX
     mov     EAX,[EBP+8]
@@ -63,19 +63,19 @@ LI_leitura:
     mov     EAX, EBP
     sub     EAX,2
     inc     BYTE AL
-    mov     ECX,EAX     
+    mov     ECX,EAX
     pop     EAX
     push    EAX
-    cmp     EAX,11 
+    cmp     EAX,11
     jne     LI_leitura
 LI_negativo:
     ;chars lidos
     pop     EAX
-    ;tratando o sinal de -      
+    ;tratando o sinal de -
     pop     ECX
     inc     ECX
     push    ECX
-    ;chars lidos    
+    ;chars lidos
     push    EAX
     mov     EAX,ECX
     and     EAX,1
@@ -86,7 +86,7 @@ LI_negativo_impar:
     ; EBP - 1
     mov     EAX,EBP
     dec     EAX
-    mov     BYTE [EAX],0x2D  
+    mov     BYTE [EAX],0x2D
     jmp     LI_negativo_fim
 LI_negativo_par:
     ;numero par de -, numero eh positivo
@@ -97,17 +97,17 @@ LI_negativo_fim:
     ;fim
     mov     EBX, EBP
     dec     EBX
-    ;inc     BYTE [EBP+12] 
+    ;inc     BYTE [EBP+12]
     mov     ECX,EBX
     pop     EAX
     push    EAX
-    cmp     EAX,11 
+    cmp     EAX,11
     jne     LI_leitura
-LI_nega:  
+LI_nega:
     ;negando o numero se ele for negativo
     mov     EDX,[EBP+8]
     neg     DWORD [EDX]
-    ;chars lidos 
+    ;chars lidos
     pop     EAX
     ;registradores utilizados
     pop     EDX
@@ -116,17 +116,17 @@ LI_nega:
     ;limpa frame de pilha
     ;mov     ESP,EBP
     ;pop     EBP
-    
+
     leave
-    ret     
+    ret
 LI_erro:
-LI_final: 
+LI_final:
     ;ve se o numero eh negativo
-    mov     AL,FLAG_NEGATIVO     
-    cmp     AL,0x2D  
+    mov     AL,FLAG_NEGATIVO
+    cmp     AL,0x2D
     je      LI_nega
-    ;chars lidos 
-    pop     EAX    
+    ;chars lidos
+    pop     EAX
     ;registradores utilizados
     pop     EDX
     pop     ECX
@@ -134,10 +134,10 @@ LI_final:
     ;limpa frame de pilha
     ;mov     ESP,EBP
     ;pop     EBP
-    
+
     leave
-    ret       
-    
+    ret
+
     %define VALOR  DWORD [EBP-16]
     %define DIGITO BYTE  [EBP-1]
     %define STRING BYTE  [EBP-12]
@@ -151,25 +151,25 @@ EscreverInteiro:
     push    EBX
     push    ECX
     push    EDX
-    
+
     ; Valor = Inteiro
     mov EDX, [EBP+8]
     mov EDX, [EDX]
     mov DWORD VALOR,EDX
-    ;imprime o -, se existir    
+    ;imprime o -, se existir
     mov     EAX,[EBP+8]
     mov     EAX,[EAX]
     and     EAX,0x80000000
     cmp     EAX,0x80000000
     jne     EI_inicio
-EI_menos:    
+EI_menos:
     neg     DWORD VALOR
     mov     EAX,4
     mov     EBX,1
     mov     ECX,menos
     mov     EDX,1
     int     80h
-EI_inicio:    
+EI_inicio:
     ;ECX = i = 0
     xor     ECX,ECX
 EI_string:
@@ -188,10 +188,10 @@ EI_string:
     mov     [EBX],EDX
     add     BYTE [EBX],0x30
     push    ECX
-    ;str[i+1] = str[i]    
+    ;str[i+1] = str[i]
     jmp     EI_armazena
 EI_laco:
-    ;i++   
+    ;i++
     pop     ECX
     inc     ECX
     ;} while (Valor != 0)
@@ -200,10 +200,10 @@ EI_laco:
     jne     EI_string
     ;chars impressos
     mov     EAX,ECX
-    push    EAX    
+    push    EAX
     jmp     EI_imprime
 EI_armazena:
-    ;str[i+1] = str[i] 
+    ;str[i+1] = str[i]
     ;string = EBP -12
     mov     EDX,EBP
     sub     EDX,12
@@ -216,7 +216,7 @@ EI_imprime:
     sub     EDX,12
     add     EDX,ECX
     push    ECX
-    ;syscall impressao monitor  
+    ;syscall impressao monitor
     mov     EAX,4
     mov     EBX,1
     mov     ECX,EDX
@@ -224,18 +224,18 @@ EI_imprime:
     int     80h
     pop     ECX
     loop    EI_imprime
-EI_final:    
-    ;conta o -, se existir    
+EI_final:
+    ;conta o -, se existir
     mov     EAX,[EBP+8]
     mov     EAX,[EAX]
     and     EAX,0x80000000
-    cmp     EAX,0x80000000    
+    cmp     EAX,0x80000000
     ;chars impressos
     pop     EAX
-    jne     EI_nao_conta_menos  
-EI_conta_menos:      
+    jne     EI_nao_conta_menos
+EI_conta_menos:
     inc     EAX
-EI_nao_conta_menos:    
+EI_nao_conta_menos:
     ;registradores utilizados
     pop     EDX
     pop     ECX
@@ -243,7 +243,7 @@ EI_nao_conta_menos:
     ;limpa frame de pilha
     ;mov     ESP,EBP
     ;pop     EBP
-    
+
     leave
     ret
 
@@ -273,7 +273,7 @@ LerChar:
     mov     ESP,EBP
     pop     EBP
     ret
-    
+
 EscreverChar:
     ;cria frame de pilha
     push    EBP
@@ -317,28 +317,28 @@ LerHexa:
     ;32 bits
     mov     ECX,8
     ;TESTE
-    MOV     EDX,0x41
-    PUSH    EDX 
-      
+    ;MOV     EDX,0x41
+    ;PUSH    EDX 
+
 LH_leitura:
     push    ECX
     ;TESTE
     ;MOV     ECX,[EBP+12]
-    ;MOV     DWORD [ECX],EDX  
+    ;MOV     DWORD [ECX],EDX
     ;le um DIGITO do teclado
     mov     EAX,3
     mov     EBX,0
     mov     ECX,EBP
     sub     ECX,1
     mov     EDX,1
-    int     80h   
+    int     80h
     ;verifica se o DIGITO eh enter
-    ;TESTE    
+    ;TESTE
     ;MOV     EAX,[ECX]
     cmp     BYTE [ECX],0x0A
     je      LH_enter
-LH_numero:    
-    ;verifica se o DIGITO esta entre 0 e 9 
+LH_numero:
+    ;verifica se o DIGITO esta entre 0 e 9
     cmp     BYTE [ECX],0x30
     jb      LH_erro
     cmp     BYTE [ECX],0x39
@@ -348,7 +348,7 @@ LH_numero:
     sub     EBX,0x30
     ;armazena
     jmp     LH_hexa
-LH_maisculo:    
+LH_maisculo:
     ;verifica se o DIGITO esta entre A e F
     cmp     BYTE [ECX],0x41
     jb      LH_erro
@@ -359,7 +359,7 @@ LH_maisculo:
     sub     EBX,0x37
     ;armazena
     jmp     LH_hexa
-LH_minusculo:    
+LH_minusculo:
     ;verifica se o DIGITO esta entre a e f
     cmp     BYTE [ECX],0x60
     jb      LH_erro
@@ -367,55 +367,55 @@ LH_minusculo:
     ja      LH_erro
     ;trata
     mov     EBX,[ECX]
-    sub     EBX,0x57  
-    ;armazena    
-    jmp     LH_hexa  
+    sub     EBX,0x57
+    ;armazena
+    jmp     LH_hexa
 LH_hexa:
     ;multiplica o HEXA por 16
     mov     EDX,[EBP+8]
     mov     EAX,[EDX]
     mov     ECX,16
-    mul     ECX    
+    mul     ECX
     ;soma o digito com o HEXAx16 e armazena no HEXA
     add     EBX,EAX
     mov     EAX,[EBP+8]
-    mov     [EAX],EBX     
-    jmp     LH_laco                                   
-LH_laco:    
-    ;le proximo DIGITO  
-    push EBX 
-    mov     EBX,EBP 
+    mov     [EAX],EBX
+    jmp     LH_laco
+LH_laco:
+    ;le proximo DIGITO
+    push EBX
+    mov     EBX,EBP
     sub EBX,1
-    inc     EBX  
-    pop EBX 
+    inc     EBX
+    pop EBX
     pop     ECX
-    ;TESTE     
+    ;TESTE
     ;POP     EDX
-    ;ADD     EDX,1  
-    ;PUSH    EDX      
+    ;ADD     EDX,1
+    ;PUSH    EDX
     loop    LH_leitura
-LH_erro:      
-LH_enter:          
+LH_erro:
+LH_enter:
 LH_final:
     pop     ECX
     ;contador de chars lidos
     mov     EAX,8
-    sub     EAX,ECX 
+    sub     EAX,ECX
     ;TESTE
-    pop     EDX 
+    pop     EDX
     ;registradores utilizados
-    pop     EDX    
-    pop     ECX    
+    pop     EDX
+    pop     ECX
     pop     EBX
     ;limpa frame de pilha
     ;mov     ESP,EBP
     ;pop     EBP
-    
+
     leave
-    ret       
+    ret
     %define VALOR  DWORD [EBP-13]
     %define DIGITO BYTE  [EBP-1]
-    %define STRING BYTE  [EBP-9]            
+    %define STRING BYTE  [EBP-9]
 EscreverHexa:
     ;cria frame de pilha
     ;push    EBP
@@ -426,20 +426,20 @@ EscreverHexa:
     push    EBX
     push    ECX
     push    EDX
-    
+
     ; Valor = Inteiro
     mov EDX, [EBP+8]
     mov EDX, [EDX]
     mov DWORD VALOR,EDX
     ;imprime 0x
     mov     EAX,4
-    mov     EBX,1           
-    mov     ECX,x  
+    mov     EBX,1
+    mov     ECX,x
     mov     EDX,X_SIZE
-    int     80h    
+    int     80h
     ;ler um byte 4x do hexa
     mov     ECX,4
-EH_inicio:    
+EH_inicio:
     ;ECX = i = 0
     xor     ECX,ECX
 EH_string:
@@ -458,22 +458,22 @@ EH_numero:
     cmp     BYTE DIGITO,0
     jb      EH_erro
     cmp     BYTE DIGITO,9
-    ja      EH_letra  
-    ;eh um numero  
+    ja      EH_letra
+    ;eh um numero
     add     BYTE DIGITO,0x30
     push    ECX
-    ;str[i+1] = str[i]    
+    ;str[i+1] = str[i]
     jmp     EH_armazena
 EH_letra:
     cmp     BYTE DIGITO,15
-    ja      EH_erro 
+    ja      EH_erro
     ;eh uma letra
     add     BYTE DIGITO,0x37
     push    ECX
-    ;str[i+1] = str[i]    
+    ;str[i+1] = str[i]
     jmp     EH_armazena
 EH_laco:
-    ;i++   
+    ;i++
     pop     ECX
     inc     ECX
     ;} while (Valor != 0)
@@ -482,10 +482,10 @@ EH_laco:
     jne     EH_string
     ;chars impressos
     mov     EAX,ECX
-    push    EAX    
+    push    EAX
     jmp     EH_imprime
 EH_armazena:
-    ;str[i+1] = str[i] 
+    ;str[i+1] = str[i]
     mov     EDX,EBP
     sub     EDX,9
     inc     ECX
@@ -497,16 +497,16 @@ EH_imprime:
     sub     EDX,9
     add     EDX,ECX
     push    ECX
-    ;syscall impressao monitor  
+    ;syscall impressao monitor
     mov     EAX,4
     mov     EBX,1
     mov     ECX,EDX
     mov     EDX,1
     int     80h
     pop     ECX
-    loop    EH_imprime    
+    loop    EH_imprime
 EH_erro:
-EH_final:  
+EH_final:
     ;chars impressos
     pop     EAX
     add     EAX,2
@@ -641,7 +641,7 @@ ES_final:
     pop     EBX
     ;retorno em EAX
     mov     EAX,[EBP+12]
-    add     EAX,1     
+    add     EAX,1
     ;limpa frame de pilha
     leave
     ret

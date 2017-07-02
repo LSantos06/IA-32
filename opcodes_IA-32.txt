@@ -1,0 +1,62 @@
+http://ref.x86asm.net/coder32.html#x00
+http://sparksandflames.com/files/x86InstructionChart.html
+
+//// SEM IO
+PUSH  REG                = po50+r
+POP   REG                = po58+r
+PUSH  LABEL              = po68
+JE    LABEL              = po74
+JL    LABEL              = po7C
+JG    LABEL              = po7F
+ADD   REG,[LABEL]        = po81,o0
+SUB   REG,[LABEL]        = po81,o5
+MOV   [LABEL],REG        = po89,or
+MOV   REG,[LABEL]        = po8B,or
+MOV   REG,IMM16/32       = poB8+r
+INT   IMM8               = poCD
+CALL  LABEL              = poE8
+JMP   LABEL              = poEB
+IMUL  [LABEL]            = poF7,o5
+IDIV  [LABEL]            = poF7,o7
+
+//// COM IO
+// CHAR_IO
+MOV   REG,REG            = po8B,or
+RET                      = poC3
+
+// STRING_IO
+SUB   REG,REG            = po2B,or
+INC   REG                = po40+r
+DEC   REG                = po48+r
+ADD   REG,IMM16/32       = po81,o0
+CMP   REG,IMM16/32       = po81,o7
+CMP   [REG],IMM16/32     = po81,o7
+MOV   [REG],REG          = po89,or
+MOV   REG,[REG+OFF]      = po8B,or
+MOV   REG,[REG]          = po8B,or
+ENTER IMM16,IMM8         = poC8
+LEAVE                    = poC9
+LOOP                     = poE1
+
+// INT_IO
+ADD   REG,REG            = po03,or
+XOR   REG,REG            = po33,or
+JB    LABEL              = po72
+JNE   LABEL              = po75
+JA    LABEL              = po77
+SUB   REG8,IMM8          = po80,o5
+CMP   REG8,IMM8          = po80,o7
+ADD   [REG],IMM16/32     = po81,o0
+AND   REG,IMM16/32       = po81,o4
+SUB   REG,IMM16/32       = po81,o5
+MOV   [REG-OFF],REG      = po8B,or
+MOV   REG8,IMM8          = poB8+r
+NEG   [REG]              = poF7,03
+NEG   [REG-OFF]          = poF7,03
+MUL   REG                = poF7,o4
+DIV   REG                = poF7,o6
+INC   REG8               = poFE,o0
+
+// HEX_IO
+MOV   [REG],IMM16/32     = poC7,o0
+CMP   [REG-OFF],IMM16/32 = po81,o7
