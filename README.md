@@ -11,6 +11,21 @@ O trabalho consiste em duas partes:
 * Lucas Santos - 14/0151010
   - [X] _Versão do gcc_: gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.4) 
   - [X] _Sistema Operacional_: elementary OS 0.4 Loki (64-bit) Built on "Ubuntu 16.04.2 LTS"
+  
+### Instruções de compilação
+A compilação do projeto é feita por meio de um **Makefile** dentro da pasta **src**. A seguir seguem as opções disponíveis para o mesmo:
+```shell
+make
+  # Realiza a compilação do tradutor 
+  
+make clean
+  # Limpa os arquivos objeto
+  
+make traduzir asm_file=
+  # Realiza a traducao de um arquivo asm (Assembly hipotetico) para um arquivo s (Assembly IA-32)
+  # Possui o argumento:
+  #   asm_file, que deve ser o nome do arquivo .asm, sem extensão  
+```
 
 ### Parte 1
 O programa ligador (__tradutor.c__) deve receber um arquivo (__arquivo.asm__) como argumento. Este arquivo deve estar na linguagem _Assembly Hipotética_ vista em sala de aula, separado em seções de _dados_ e _códigos_. 
