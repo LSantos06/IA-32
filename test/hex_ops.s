@@ -12,6 +12,16 @@ mov dword [SOMA],eax
 mov eax,[OP1]
 sub dword EAX, [OP2]
 mov dword [SUBTRACAO],eax
+mov eax,[OP1]
+idiv dword [OP2]
+mov dword [DIVISAO],eax
+mov eax,[OP1]
+imul dword [OP2]
+mov dword [MULTIPLICACAO],eax
+push ebx
+mov ebx, [OP1]
+mov dword [COPIA], ebx
+pop ebx
 jmp PRINT
 PRINT: push SOMA
 call EscreverHexa
@@ -19,6 +29,21 @@ push 1
 push NEWLINE
 call EscreverString
 push SUBTRACAO
+call EscreverHexa
+push 1
+push NEWLINE
+call EscreverString
+push DIVISAO
+call EscreverHexa
+push 1
+push NEWLINE
+call EscreverString
+push MULTIPLICACAO
+call EscreverHexa
+push 1
+push NEWLINE
+call EscreverString
+push COPIA
 call EscreverHexa
 push 1
 push NEWLINE
@@ -32,8 +57,11 @@ section .data
 NEWLINE: dd 0xA
 
 section .bss
+DIVISAO: resd 1
+MULTIPLICACAO: resd 1
 SUBTRACAO: resd 1
 SOMA: resd 1
+COPIA: resd 1
 OP2: resd 1
 OP1: resd 1
 
